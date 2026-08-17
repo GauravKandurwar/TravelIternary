@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Europe 2026 — Travel Itinerary</title>
+<style>
+  :root{
+    --bg:#0f1220;
+    --bg-soft:#171b2e;
+    --card:#1d2338;
+    --card-2:#232a45;
+    --ink:#eef1fb;
+    --muted:#a5adcb;
+    --line:#2c3452;
+    --accent:#6c8bff;
+    --accent-2:#ff7aa8;
+    --gold:#ffd166;
+    --green:#39d98a;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --radius:18px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 700px at 80% -10%,#22284a 0%,transparent 60%),
+               radial-gradient(1000px 600px at -10% 10%,#2a1c3a 0%,transparent 55%),
+               var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+  }
+  a{color:var(--accent);text-decoration:none}
+
+  /* ===== Top bar ===== */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(12px);
+    background:rgba(15,18,32,.78);
+    border-bottom:1px solid var(--line);
+  }
+  .topbar-inner{
+    max-width:1150px;margin:0 auto;padding:14px 20px;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  }
+  .brand{font-weight:800;font-size:1.15rem;letter-spacing:.3px;display:flex;align-items:center;gap:10px}
+  .brand .flag{font-size:1.4rem}
+  .dest-tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+  .dest-tab{
+    padding:8px 14px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);font-weight:600;font-size:.9rem;cursor:pointer;
+    transition:.2s;
+  }
+  .dest-tab.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  .dest-tab.soon{opacity:.55;cursor:not-allowed}
+  .destination-view{display:none}
+  .destination-view.active{display:block}
+
+  /* ===== Hero ===== */
+  .hero{
+    max-width:1150px;margin:26px auto 0;padding:0 20px;
+  }
+  .hero-card{
+    position:relative;overflow:hidden;border-radius:var(--radius);
+    box-shadow:var(--shadow);border:1px solid var(--line);
+    min-height:280px;display:flex;align-items:flex-end;
+    background:#000;
+  }
+  .hero-card img{
+    position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.62;
+  }
+  .hero-overlay{
+    position:relative;z-index:2;padding:28px 30px;
+    background:linear-gradient(to top,rgba(10,12,22,.92),rgba(10,12,22,.15));
+    width:100%;
+  }
+  .hero-overlay h1{margin:0 0 6px;font-size:2.1rem;line-height:1.15}
+  .hero-meta{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:.95rem;margin-top:8px}
+  .hero-meta b{color:var(--ink)}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--card-2);
+    border:1px solid var(--line);padding:6px 12px;border-radius:999px;font-size:.85rem}
+
+  /* ===== Day nav ===== */
+  .daynav{
+    position:sticky;top:63px;z-index:40;
+    max-width:1150px;margin:22px auto 0;padding:10px 12px;
+    display:flex;gap:8px;overflow-x:auto;
+    background:rgba(23,27,46,.9);backdrop-filter:blur(10px);
+    border:1px solid var(--line);border-radius:14px;
+  }
+  .daynav::-webkit-scrollbar{height:6px}
+  .daynav::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px}
+  .daylink{
+    white-space:nowrap;padding:9px 14px;border-radius:10px;font-size:.85rem;font-weight:600;
+    color:var(--muted);border:1px solid transparent;transition:.2s;flex-shrink:0;
+  }
+  .daylink small{display:block;font-weight:500;font-size:.72rem;opacity:.75}
+  .daylink:hover{background:var(--card)}
+  .daylink.active{color:#fff;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+
+  /* ===== Layout ===== */
+  .wrap{max-width:1150px;margin:0 auto;padding:20px}
+  section.day{scroll-margin-top:150px;margin:34px 0}
+  .day-head{display:flex;align-items:center;gap:14px;margin-bottom:6px;flex-wrap:wrap}
+  .day-badge{
+    display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+    min-width:64px;height:64px;border-radius:14px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#fff;font-weight:800;
+    box-shadow:var(--shadow);
+  }
+  .day-badge small{font-weight:600;font-size:.7rem;opacity:.9}
+  .day-badge span{font-size:1.35rem;line-height:1}
+  .day-title h2{margin:0;font-size:1.5rem}
+  .day-title p{margin:2px 0 0;color:var(--muted);font-size:.95rem}
+
+  /* ===== Timeline ===== */
+  .timeline{position:relative;margin:20px 0 0;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(var(--accent),var(--accent-2))}
+  .tl-item{position:relative;margin:0 0 16px}
+  .tl-dot{position:absolute;left:-26px;top:22px;width:14px;height:14px;border-radius:50%;
+    background:var(--gold);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--gold)}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);overflow:hidden;
+  }
+  .card-head{
+    display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;user-select:none;
+  }
+  .time-pill{
+    background:var(--card-2);border:1px solid var(--line);color:var(--gold);
+    font-weight:700;font-size:.8rem;padding:5px 10px;border-radius:8px;white-space:nowrap;
+  }
+  .card-head h3{margin:0;font-size:1.08rem;flex:1}
+  .toggle{color:var(--muted);transition:.3s;font-size:1.1rem}
+  .card.open .toggle{transform:rotate(180deg)}
+
+  .card-body{display:none;padding:0 18px 18px;border-top:1px solid var(--line)}
+  .card.open .card-body{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+
+  .card-body h4{margin:16px 0 8px;font-size:.95rem;color:var(--ink);
+    display:flex;align-items:center;gap:8px}
+  .card-body p{margin:8px 0;color:#d6dbf0}
+
+  /* Gallery */
+  .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:12px 0}
+  .gallery img{
+    width:100%;height:120px;object-fit:cover;border-radius:12px;border:1px solid var(--line);
+    cursor:zoom-in;transition:.25s;background:var(--card-2);
+  }
+  .gallery img:hover{transform:scale(1.03);border-color:var(--accent)}
+  .gallery img.image-error{
+    object-fit:contain;padding:12px;cursor:default;color:var(--muted);
+  }
+
+  /* Checklist */
+  .checklist{list-style:none;padding:0;margin:8px 0}
+  .checklist li{
+    display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:10px;
+    transition:.15s;cursor:pointer;
+  }
+  .checklist li:hover{background:var(--card-2)}
+  .checklist .box{
+    width:20px;height:20px;border-radius:6px;border:2px solid var(--muted);
+    flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.8rem;color:transparent;
+    transition:.15s;
+  }
+  .checklist li.done .box{background:var(--green);border-color:var(--green);color:#04240f}
+  .checklist li.done span{text-decoration:line-through;color:var(--muted)}
+
+  /* Note boxes */
+  .note{border-radius:12px;padding:12px 14px;margin:12px 0;font-size:.92rem;border:1px solid}
+  .note.tip{background:rgba(108,139,255,.1);border-color:rgba(108,139,255,.35)}
+  .note.star{background:rgba(255,209,102,.1);border-color:rgba(255,209,102,.35)}
+  .note.warn{background:rgba(255,122,168,.1);border-color:rgba(255,122,168,.35)}
+  .note b{color:#fff}
+
+  .route{background:rgba(57,217,138,.08);border:1px solid rgba(57,217,138,.3);
+    border-radius:12px;padding:12px 14px;margin:12px 0;font-size:.92rem}
+  .route b{color:var(--green)}
+  .place-link{display:inline-block;margin-top:7px;font-weight:700}
+
+  .rome-tools{max-width:1150px;margin:18px auto 0;padding:0 20px;display:flex;gap:10px;
+    align-items:center;flex-wrap:wrap}
+  .filter-group{display:flex;gap:6px;flex-wrap:wrap;padding:6px;background:var(--bg-soft);
+    border:1px solid var(--line);border-radius:12px}
+  .filter-btn{border:0;background:transparent;color:var(--muted);padding:7px 10px;border-radius:8px;
+    font:inherit;font-size:.78rem;font-weight:700;cursor:pointer}
+  .filter-btn.active{background:var(--card-2);color:var(--ink)}
+  .fatigue-btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 12px;
+    border-radius:10px;font:inherit;font-size:.8rem;font-weight:750;cursor:pointer}
+  .fatigue-btn.active{background:rgba(57,217,138,.12);border-color:var(--green);color:var(--green)}
+  .time-adjust{display:flex;align-items:center;gap:5px;color:var(--muted);font-size:.78rem}
+  .time-adjust button{width:32px;height:32px;border:1px solid var(--line);border-radius:8px;
+    background:var(--card);color:var(--ink);font-size:1rem;cursor:pointer}
+  .activity-meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}
+  .activity-tag{font-size:.72rem;font-weight:750;color:var(--muted);padding:3px 7px;
+    border:1px solid var(--line);border-radius:7px;background:var(--card-2)}
+  .activity-tag.must{color:var(--green);border-color:rgba(57,217,138,.4)}
+  .activity-tag.recommended{color:var(--gold);border-color:rgba(255,209,102,.4)}
+  .activity-tag.optional{color:var(--accent);border-color:rgba(108,139,255,.4)}
+  .activity-complete{margin-top:14px;border:1px solid var(--line);background:var(--card-2);
+    color:var(--muted);padding:8px 10px;border-radius:8px;font:inherit;font-size:.78rem;
+    font-weight:750;cursor:pointer}
+  .activity-complete.done{color:var(--green);border-color:rgba(57,217,138,.45)}
+  .rome-activity.activity-done .card{opacity:.65}
+  .rome-activity.filtered-out{display:none}
+  [data-view="italy"].fatigue-mode .rome-activity[data-priority="optional"]{display:none}
+  [data-view="italy"].fatigue-mode .rome-activity[data-priority="recommended"]{opacity:.75}
+  [data-view="italy"].fatigue-mode .note.fatigue-note{display:block}
+  .fatigue-note{display:none}
+  .walking-path{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 0}
+  .walking-path span{font-size:.82rem;font-weight:700;color:var(--ink)}
+  .walking-path i{font-style:normal;color:var(--accent)}
+
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+  .info-box{background:var(--card-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .info-box h5{margin:0 0 6px;font-size:.82rem;text-transform:uppercase;letter-spacing:.6px;color:var(--accent)}
+  .info-box p{margin:0;font-size:.9rem;color:#d6dbf0}
+
+  /* Summary table */
+  .table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--line);box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;min-width:620px;background:var(--card)}
+  th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);font-size:.9rem}
+  th{background:var(--card-2);color:var(--accent);text-transform:uppercase;font-size:.75rem;letter-spacing:.5px}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:var(--card-2)}
+
+  .section-title{display:flex;align-items:center;gap:10px;margin:36px 0 14px;font-size:1.3rem}
+  .section-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* Progress */
+  .progress-wrap{margin-top:16px}
+  .progress-bar{height:10px;border-radius:999px;background:var(--card-2);overflow:hidden;border:1px solid var(--line)}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--accent));transition:width .4s}
+  .progress-label{font-size:.82rem;color:var(--muted);margin-top:6px}
+
+  footer{text-align:center;color:var(--muted);padding:40px 20px;font-size:.85rem}
+
+  /* Lightbox */
+  .lightbox{
+    position:fixed;inset:0;z-index:100;background:rgba(5,7,15,.92);
+    display:none;align-items:center;justify-content:center;padding:30px;cursor:zoom-out;
+  }
+  .lightbox.show{display:flex}
+  .lightbox img{max-width:92%;max-height:88%;border-radius:14px;box-shadow:var(--shadow)}
+  .lightbox .caption{position:absolute;bottom:24px;left:0;right:0;text-align:center;color:#fff}
+
+  @media(max-width:640px){
+    .info-grid{grid-template-columns:1fr}
+    .hero-overlay h1{font-size:1.6rem}
+    .daynav{top:59px}
+    .rome-tools{align-items:stretch}
+    .filter-group{width:100%;overflow-x:auto;flex-wrap:nowrap}
+    .filter-btn{white-space:nowrap}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Top bar ===== -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand"><span class="flag">🌍</span> Europe 2026</div>
+    <div class="dest-tabs">
+      <button class="dest-tab active" data-destination="france">🇫🇷 France · Paris</button>
+      <button class="dest-tab" data-destination="switzerland">🇨🇭 Switzerland</button>
+      <button class="dest-tab" data-destination="italy">🇮🇹 Italy · Rome</button>
+    </div>
+  </div>
+</div>
+
+<main class="destination-view active" data-view="france">
+<!-- ===== Hero ===== -->
+<div class="hero">
+  <div class="hero-card">
+    <img src="assets/images/hero-eiffel.jpg" alt="Eiffel Tower, Paris" />
+    <div class="hero-overlay">
+      <h1>🇫🇷 Paris Travel Itinerary</h1>
+      <div class="hero-meta">
+        <span class="chip">📅 <b>Sep 1–6, 2026</b></span>
+        <span class="chip">👨‍👩‍👧 <b>2 Adults + Nyra (4)</b></span>
+        <span class="chip">➡️ Next: <b>Interlaken 🇨🇭</b></span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Tick off tasks as you plan — 0% complete</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Day nav ===== -->
+<nav class="daynav" id="daynav">
+  <a class="daylink" href="#day1"><small>Tue</small>Sep 1<small>Travel</small></a>
+  <a class="daylink" href="#day2"><small>Wed</small>Sep 2<small>Arrival · Eiffel</small></a>
+  <a class="daylink" href="#day3"><small>Thu</small>Sep 3<small>Trocadéro · Cruise</small></a>
+  <a class="daylink" href="#day4"><small>Fri</small>Sep 4<small>Louvre · Tuileries</small></a>
+  <a class="daylink" href="#day5"><small>Sat</small>Sep 5<small>Lafayette · Opera</small></a>
+  <a class="daylink" href="#day6"><small>Sun</small>Sep 6<small>→ Interlaken</small></a>
+  <a class="daylink" href="#overview"><small>Recap</small>Overview<small>&amp; Tips</small></a>
+</nav>
+
+<div class="wrap">
+
+  <!-- ============ DAY 1 ============ -->
+  <section class="day" id="day1">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>1</span></div>
+      <div class="day-title"><h2>✈️ Seattle → Paris</h2><p>Tuesday · Travel Day</p></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">All day</span><h3>✈️ Overnight Flight to Paris</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Depart Seattle and take the overnight flight to Paris. Try to sleep on board and keep your first day in Paris light.</p>
+            <div class="note tip">💡 <b>Tip:</b> Set your watch to Paris time as soon as you board — it helps your body adjust to the 9-hour difference faster.</div>
+            <h4>🧳 Keep in your carry-on</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Passports</span></li>
+              <li><span class="box">✔</span><span>Schengen visa documents</span></li>
+              <li><span class="box">✔</span><span>Airbnb address &amp; booking</span></li>
+              <li><span class="box">✔</span><span>Phone chargers</span></li>
+              <li><span class="box">✔</span><span>Basic toiletries</span></li>
+              <li><span class="box">✔</span><span>One change of clothes for Nyra</span></li>
+              <li><span class="box">✔</span><span>Essential medications</span></li>
+              <li><span class="box">✔</span><span>Travel documents</span></li>
+            </ul>
+            <div class="note star">⭐ <b>Important:</b> Keep passports and documents easily accessible — you'll need them right after landing.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DAY 2 ============ -->
+  <section class="day" id="day2">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>2</span></div>
+      <div class="day-title"><h2>🗼 Arrival + Eiffel Tower + Pont Alexandre III</h2><p>Wednesday · Easy arrival evening</p></div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">1:00 PM</span><h3>🛬 Arrive in Paris (CDG)</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Allow about <b>1–1.5 hours</b> for immigration, baggage collection, and getting out of the airport.</p>
+            <div class="info-grid">
+              <div class="info-box"><h5>🚕 Recommended with luggage</h5><p>Take an official taxi to <b>18 Rue Bosquet, 75007</b>. It is the calmest option after the overnight flight with Nyra and suitcases.</p></div>
+              <div class="info-box"><h5>👧 With Nyra</h5><p>A taxi/Uber is the calmest option after a long flight. Ask for a booster if needed.</p></div>
+            </div>
+            <div class="route"><b>Public transport alternative · Navigo zones 1–5:</b> RER B from CDG to Gare du Nord → Metro 4 to Strasbourg–Saint-Denis → Metro 8 toward Balard to École Militaire → 5-minute walk. Allow about 70–85 minutes and expect stairs.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">3:00–5:00 PM</span><h3>🏠 Airbnb — Check in &amp; Rest</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Check in at <b>18 Rue Bosquet</b>, freshen up, have a light snack, shower, and <b>rest</b>.</p>
+            <p><b>Late lunch / snack:</b> Maison Bergeron, 112 Rue Saint-Dominique. Pick a cheese or vegetable sandwich, baguette, pastry and coffee. Ask about egg if needed.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Maison+Bergeron+112+Rue+Saint-Dominique+Paris" target="_blank" rel="noopener">📍 Open Maison Bergeron in Maps</a>
+            <div class="note warn">⭐ <b>Don't over-plan today.</b> The overnight flight + time difference is tiring, especially for Nyra. A slow start protects the rest of the trip.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">5:30–7:15 PM</span><h3>🗼 Eiffel Tower &amp; Champ de Mars</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Route: <b>Airbnb → Trocadéro → Eiffel Tower → Champ de Mars</b>. Seeing the tower on your very first evening is absolutely worth it.</p>
+            <div class="route"><b>From home:</b> walk about 15 minutes to Champ de Mars/Eiffel Tower. For Trocadéro first, take Metro 8 from École Militaire to La Motte-Picquet–Grenelle, then Metro 6 to Trocadéro.</div>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-01.jpg" alt="Eiffel Tower" />
+              <img loading="lazy" src="assets/images/image-02.jpg" alt="Eiffel Tower from Champ de Mars" />
+              <img loading="lazy" src="assets/images/image-03.jpg" alt="Champ de Mars" />
+              <img loading="lazy" src="assets/images/image-04.jpg" alt="Eiffel at night" />
+            </div>
+            <h4>✅ Explore</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Eiffel Tower up close</span></li>
+              <li><span class="box">✔</span><span>Champ de Mars lawn</span></li>
+              <li><span class="box">✔</span><span>Seine riverbank</span></li>
+              <li><span class="box">✔</span><span>Family photos</span></li>
+              <li><span class="box">✔</span><span>Let Nyra walk/play on the lawn</span></li>
+            </ul>
+            <h4>📸 Best experience</h4>
+            <p>Stay until sunset to see: <b>Daylight → Sunset → Illuminated tower ✨</b>. The tower sparkles for 5 minutes on the hour after dark.</p>
+            <h4>📖 A little history</h4>
+            <p>Built by Gustave Eiffel for the <b>1889 World's Fair</b>, the 330 m iron tower was meant to be temporary and was widely criticised at the time. It survived because it made a perfect radio antenna — and became the symbol of Paris.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">7:30 PM</span><h3>🌉 Pont Alexandre III</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Spend ~30–45 minutes at Paris's most ornate bridge.</p>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-05.jpg" alt="Pont Alexandre III at night" />
+              <img loading="lazy" src="assets/images/image-06.jpg" alt="Pont Alexandre III statues" />
+              <img loading="lazy" src="assets/images/image-07.jpg" alt="Ornate lamps" />
+            </div>
+            <h4>✅ Look for</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Golden winged statues</span></li>
+              <li><span class="box">✔</span><span>Ornate Art Nouveau lamps</span></li>
+              <li><span class="box">✔</span><span>Seine &amp; Eiffel Tower views</span></li>
+              <li><span class="box">✔</span><span>Family photos</span></li>
+            </ul>
+            <div class="note star">⭐ <b>Best time:</b> sunset / blue hour, as the lamps switch on.</div>
+            <h4>📖 A little history</h4>
+            <p>Named after Tsar Alexander III, the bridge was built for the <b>1900 World's Fair</b> to symbolise the Franco-Russian alliance. Its low, single-span design was engineered so it wouldn't block the view of the Champs-Élysées and Les Invalides.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">8:30–10:00 PM</span><h3>🍕 Italian dinner — Chez Pippo</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p><b>Chez Pippo · 31 Avenue de la Bourdonnais · €20–30.</b> A nearby Italian trattoria known for authentic pizza and pasta. Vegetarian choices normally include Margherita/vegetable pizza, pesto or tomato-based pasta; confirm that the cheese is suitable for you.</p>
+            <div class="route"><b>From Pont Alexandre III:</b> walk along Rue Saint-Dominique for about 15 minutes. After dinner, home is about a 7-minute walk.</div>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Chez+Pippo+31+Avenue+de+la+Bourdonnais+Paris" target="_blank" rel="noopener">📍 Open Chez Pippo in Maps</a>
+            <div class="note warn">🚫 <b>Don't add the Seine cruise tonight.</b> You have a dedicated cruise evening tomorrow — keeping tonight relaxed makes the whole trip better.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DAY 3 ============ -->
+  <section class="day" id="day3">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>3</span></div>
+      <div class="day-title"><h2>📸 Trocadéro + Arc de Triomphe + Champs-Élysées + Seine Cruise</h2><p>Thursday · Iconic Paris</p></div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">8:00 AM</span><h3>🥑 Breakfast — Kozy Bosquet</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p><b>Kozy Bosquet · 79 Avenue Bosquet · €10–20.</b> Order avocado toast without egg, fruit pancakes, granola or pastries. It opens around 8 AM and is a practical start before Trocadéro.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Kozy+Bosquet+79+Avenue+Bosquet+Paris" target="_blank" rel="noopener">📍 Open Kozy Bosquet in Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">9:30 AM</span><h3>📸 Place du Trocadéro</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Spend ~45–60 min. This is the <b>best spot for Eiffel Tower photos</b>.</p>
+            <div class="route"><b>Route:</b> walk to École Militaire → Metro 8 to La Motte-Picquet–Grenelle → change to Metro 6 → Trocadéro.</div>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-08.jpg" alt="Trocadéro and Eiffel Tower" />
+              <img loading="lazy" src="assets/images/image-09.jpg" alt="Palais de Chaillot" />
+              <img loading="lazy" src="assets/images/image-10.jpg" alt="Trocadéro gardens" />
+            </div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Eiffel Tower photos from the terrace</span></li>
+              <li><span class="box">✔</span><span>Family &amp; Nyra photos</span></li>
+              <li><span class="box">✔</span><span>Enjoy the view &amp; fountains</span></li>
+            </ul>
+            <div class="note star">⭐ <b>Go early:</b> better light and fewer crowds than the afternoon.</div>
+            <h4>📖 A little history</h4>
+            <p>The <b>Palais de Chaillot</b> here was built for the 1937 International Exhibition. Its terrace between the two curved wings frames the most famous Eiffel Tower view in the world.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">11:00 AM–12:00 PM</span><h3>🏛️ Arc de Triomphe</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Take <b>Metro 6 directly from Trocadéro to Charles de Gaulle–Étoile</b>.</p>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-11.jpg" alt="Arc de Triomphe" />
+              <img loading="lazy" src="assets/images/image-12.jpg" alt="Arc de Triomphe detail" />
+              <img loading="lazy" src="assets/images/image-13.jpg" alt="View from the Arc" />
+            </div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Arc de Triomphe exterior &amp; reliefs</span></li>
+              <li><span class="box">✔</span><span>Tomb of the Unknown Soldier</span></li>
+              <li><span class="box">✔</span><span>Champs-Élysées entrance</span></li>
+              <li><span class="box">✔</span><span>Photos</span></li>
+            </ul>
+            <div class="note tip">⭐ <b>Optional rooftop:</b> if everyone's up for the 284 steps, the panorama over Paris's 12 radiating avenues is superb. Use the underground passage to cross — never cross the roundabout on foot!</div>
+            <h4>📖 A little history</h4>
+            <p>Commissioned by <b>Napoleon in 1806</b> after his victory at Austerlitz, it honours those who fought for France. Beneath it lies the Tomb of the Unknown Soldier from WWI, with an eternal flame rekindled every evening.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">12:00–2:00 PM</span><h3>🌮 Mexican lunch + Champs-Élysées</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Walk the famous avenue toward <b>Tío, 1 Rue Saint-Philippe du Roule</b>. This modern Mexican restaurant is close to Champs-Élysées, opens at noon, and lists vegetarian options. Try the mushroom tacos with avocado cream and ask for no meat/fish stock. Budget <b>€20–60</b>.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Tio+1+Rue+Saint-Philippe+du+Roule+Paris" target="_blank" rel="noopener">📍 Open Tío in Maps</a>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-14.jpg" alt="Champs-Élysées" />
+              <img loading="lazy" src="assets/images/image-15.jpg" alt="Champs-Élysées avenue" />
+            </div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Shopping &amp; window browsing</span></li>
+              <li><span class="box">✔</span><span>Mexican vegetarian lunch at Tío</span></li>
+              <li><span class="box">✔</span><span>Dessert or ice cream</span></li>
+              <li><span class="box">✔</span><span>Photos</span></li>
+            </ul>
+            <div class="note tip">👧 <b>With Nyra:</b> you don't need to walk the whole avenue. Use the time for food, shops, and atmosphere, and take breaks.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">2:00–4:30 PM</span><h3>🏠 Airbnb — Family break</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <div class="note star">⭐ <b>Important break.</b> Rest, snack, charge phones, freshen up, let Nyra nap. This makes the evening cruise much more enjoyable.</div>
+            <div class="route"><b>Return home:</b> Metro 9 from Saint-Philippe du Roule to Franklin D. Roosevelt → Metro 1 to Concorde → Metro 8 to École Militaire. A simpler alternative is Bus 92 from the Champs-Élysées/Arc area toward Bosquet–Grenelle.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">5:30–7:00 PM</span><h3>🚢 Seine River Cruise</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Book a cruise around <b>sunset / early evening</b> for: <b>☀️ Daylight → 🌅 Sunset → ✨ Illuminated Paris</b>.</p>
+            <div class="route"><b>To Bateaux Mouches:</b> walk about 15–20 minutes from Rue Bosquet to Pont de l'Alma. No transit is necessary.</div>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-16.jpg" alt="Seine cruise boat" />
+              <img loading="lazy" src="assets/images/image-17.jpg" alt="Seine and Eiffel Tower" />
+              <img loading="lazy" src="assets/images/image-18.jpg" alt="Seine at night" />
+            </div>
+            <h4>Along the Seine you'll see</h4>
+            <p>Eiffel Tower · Louvre · Musée d'Orsay · Notre-Dame · Île de la Cité · historic bridges.</p>
+            <div class="info-grid">
+              <div class="info-box"><h5>🎟️ Booking</h5><p>Bateaux Mouches &amp; Vedettes du Pont Neuf run ~1-hour loops. Kids under 4 usually free. Book online to skip the queue.</p></div>
+              <div class="info-box"><h5>🧥 Bring</h5><p>A light jacket — it's breezy on the open upper deck at dusk.</p></div>
+            </div>
+            <div class="note star">⭐ This is one experience I'd definitely keep in your itinerary.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">7:30–9:00 PM</span><h3>🍛 Indian dinner — Kamal Shri</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p><b>Kamal Shri · 15 Rue Augereau · €10–20.</b> A casual nearby Indian choice with vegetarian and vegan dishes. Good options include dal, chana masala, vegetable curry, rice and roti. Confirm no egg in breads.</p>
+            <div class="route"><b>From the cruise:</b> walk about 15 minutes. After dinner, 18 Rue Bosquet is only about 6 minutes away on foot.</div>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Kamal+Shri+15+Rue+Augereau+Paris" target="_blank" rel="noopener">📍 Open Kamal Shri in Maps</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DAY 4 ============ -->
+  <section class="day" id="day4">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>4</span></div>
+      <div class="day-title"><h2>🖼️ Louvre + Tuileries Garden</h2><p>Friday · Art &amp; relaxation</p></div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">9:30 AM–12:30 PM</span><h3>🖼️ Louvre Museum</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <div class="note tip">🎟️ <b>Book a timed entry in advance</b> — it's mandatory and saves a long queue.</div>
+            <div class="route"><b>From home:</b> board Bus 69 at Bosquet–Saint-Dominique and exit near Quai François Mitterrand/Pont des Arts, then walk to the Louvre. This is simpler than changing Metro lines.</div>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-19.jpg" alt="Louvre pyramid" />
+              <img loading="lazy" src="assets/images/image-20.jpg" alt="Mona Lisa" />
+              <img loading="lazy" src="assets/images/image-21.jpg" alt="Venus de Milo" />
+              <img loading="lazy" src="assets/images/image-22.jpg" alt="Winged Victory" />
+              <img loading="lazy" src="assets/images/image-23.jpg" alt="Louvre courtyard" />
+              <img loading="lazy" src="assets/images/image-24.jpg" alt="Louvre at night" />
+            </div>
+            <h4>⭐ Focus on the highlights (don't try to see everything)</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>⭐ Mona Lisa</span></li>
+              <li><span class="box">✔</span><span>⭐ Venus de Milo</span></li>
+              <li><span class="box">✔</span><span>⭐ Winged Victory of Samothrace</span></li>
+              <li><span class="box">✔</span><span>Egyptian collection</span></li>
+              <li><span class="box">✔</span><span>Main palace interiors</span></li>
+              <li><span class="box">✔</span><span>Glass Pyramid (inside &amp; out)</span></li>
+            </ul>
+            <div class="info-grid">
+              <div class="info-box"><h5>⏱️ Time</h5><p>2.5–3 hours is plenty. Enter via the Carrousel du Louvre (underground) for shorter lines.</p></div>
+              <div class="info-box"><h5>👧 With Nyra</h5><p>If she gets tired, leave early. Turn the Mona Lisa hunt into a game to keep her engaged.</p></div>
+            </div>
+            <h4>📖 A little history</h4>
+            <p>Once a medieval fortress and then a royal palace, the Louvre became a public museum during the <b>French Revolution in 1793</b>. I. M. Pei's glass pyramid was added in 1989. It's the world's most-visited museum, home to ~35,000 works.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">12:30–1:30 PM</span><h3>🥘 Indian lunch — Arya Bhavan Louvre</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p><b>Arya Bhavan · 3 Rue des Pyramides · €10–20.</b> The safest strict-vegetarian meal: a <b>100% vegetarian kitchen</b> with vegan and Jain-friendly choices. Try masala dosa, idli, South Indian thali, sambar rice and filter coffee. Mini idli is a useful child-friendly option.</p>
+            <p>It is about 10 minutes from the Louvre and naturally places you beside the Tuileries for the afternoon.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Arya+Bhavan+3+Rue+des+Pyramides+Paris" target="_blank" rel="noopener">📍 Open Arya Bhavan in Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">1:30–3:30 PM</span><h3>🌳 Tuileries Garden</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-25.jpg" alt="Tuileries Garden" />
+              <img loading="lazy" src="assets/images/image-26.jpg" alt="Tuileries pond" />
+              <img loading="lazy" src="assets/images/image-27.jpg" alt="Tuileries fountain" />
+            </div>
+            <h4>Perfect for a family break</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Walk through the garden</span></li>
+              <li><span class="box">✔</span><span>Carousel ride for Nyra</span></li>
+              <li><span class="box">✔</span><span>Ice cream</span></li>
+              <li><span class="box">✔</span><span>Sit by the round pond</span></li>
+              <li><span class="box">✔</span><span>Photos</span></li>
+            </ul>
+            <h4>📖 A little history</h4>
+            <p>Created by <b>Catherine de' Medici in 1564</b> and later redesigned by André Le Nôtre (the gardener of Versailles), it's the oldest and largest public garden in Paris, connecting the Louvre to Place de la Concorde.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">3:30 PM onward</span><h3>🏠 Rest — Flexible evening</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <div class="info-grid">
+              <div class="info-box"><h5>⭐ Option A (recommended)</h5><p>Metro 8 from Concorde to École Militaire, rest at home, then have a simple French dinner nearby.</p></div>
+              <div class="info-box"><h5>Option B</h5><p>If everyone still has energy: continue through Place de la Concorde → Madeleine → evening café.</p></div>
+            </div>
+            <p><b>French dinner:</b> choose a nearby crêperie and order a Breton buckwheat galette with cheese, mushroom, spinach or ratatouille, explicitly without egg. This keeps dinner flexible after a long museum day.</p>
+            <div class="note star">⭐ Choose <b>Option A</b> if anyone's tired.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DAY 5 ============ -->
+  <section class="day" id="day5">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>5</span></div>
+      <div class="day-title"><h2>🛍️ Galeries Lafayette + Palais Garnier + Final Shopping</h2><p>Saturday · Easy final Paris day</p></div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">10:00 AM–12:00 PM</span><h3>🛍️ Galeries Lafayette Haussmann</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <div class="route"><b>From home:</b> Metro 8 from École Militaire directly to Opéra, then walk about 5 minutes to Galeries Lafayette.</div>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-28.jpg" alt="Galeries Lafayette dome" />
+              <img loading="lazy" src="assets/images/image-29.jpg" alt="Galeries Lafayette interior" />
+              <img loading="lazy" src="assets/images/image-30.jpg" alt="Cupola" />
+            </div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>⭐ Famous stained-glass glass dome</span></li>
+              <li><span class="box">✔</span><span>Shopping floors</span></li>
+              <li><span class="box">✔</span><span>Free rooftop terrace &amp; Paris views</span></li>
+              <li><span class="box">✔</span><span>Souvenirs / gifts</span></li>
+            </ul>
+            <div class="note tip">💡 <b>Tip:</b> The rooftop terrace is free and gives a stunning open-air view over the Opera and rooftops — great for photos with Nyra.</div>
+            <h4>📖 A little history</h4>
+            <p>Opened in <b>1912</b>, its Art Nouveau <b>43 m glass-and-steel dome</b> is a Belle Époque masterpiece designed to make shopping feel like visiting a cathedral of fashion.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">12:00–1:00 PM</span><h3>🍝 Italian lunch — Capucci Trattoria</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p><b>Capucci Trattoria · 21 Rue Joubert · €20–30.</b> About 5 minutes from Galeries Lafayette and Palais Garnier. It lists vegetarian dishes; choose a vegetable pizza, tomato-based pasta, pesto pasta or burrata dish. Ask whether the pasta contains egg and whether cheese uses animal rennet if that matters.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Capucci+Trattoria+21+Rue+Joubert+Paris" target="_blank" rel="noopener">📍 Open Capucci in Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">1:30–3:00 PM</span><h3>🏛️ Palais Garnier (Opéra)</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Your "Opera Garnier" is officially the <b>Palais Garnier</b>.</p>
+            <div class="gallery">
+              <img loading="lazy" src="assets/images/image-31.jpg" alt="Palais Garnier facade" />
+              <img loading="lazy" src="assets/images/image-32.jpg" alt="Grand staircase" />
+              <img loading="lazy" src="assets/images/image-33.jpg" alt="Grand Foyer" />
+              <img loading="lazy" src="assets/images/image-34.jpg" alt="Auditorium with Chagall ceiling" />
+            </div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>⭐ Grand staircase</span></li>
+              <li><span class="box">✔</span><span>⭐ Grand Foyer (mirror gallery)</span></li>
+              <li><span class="box">✔</span><span>Main auditorium</span></li>
+              <li><span class="box">✔</span><span>Chagall painted ceiling</span></li>
+              <li><span class="box">✔</span><span>Photos</span></li>
+            </ul>
+            <div class="info-grid">
+              <div class="info-box"><h5>⏱️ Time</h5><p>1–1.5 hours for a self-guided visit. Buy tickets online.</p></div>
+              <div class="info-box"><h5>🎭 Fun fact</h5><p>This opera house inspired <b>The Phantom of the Opera</b> — there really is an underground water reservoir beneath it.</p></div>
+            </div>
+            <h4>📖 A little history</h4>
+            <p>Designed by <b>Charles Garnier</b> and opened in <b>1875</b> under Napoleon III, it's the grandest example of the opulent Beaux-Arts style. Marc Chagall painted the famous ceiling in 1964.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">3:00–5:00 PM</span><h3>☕ Final shopping / café</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <h4>Buy anything you still need</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Souvenirs</span></li>
+              <li><span class="box">✔</span><span>French chocolates</span></li>
+              <li><span class="box">✔</span><span>Gifts</span></li>
+              <li><span class="box">✔</span><span>Clothes</span></li>
+              <li><span class="box">✔</span><span>Anything you missed</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">5:30–7:00 PM</span><h3>🧳 Pack for Switzerland</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Passports</span></li>
+              <li><span class="box">✔</span><span>Train tickets</span></li>
+              <li><span class="box">✔</span><span>Switzerland hotel booking</span></li>
+              <li><span class="box">✔</span><span>Chargers</span></li>
+              <li><span class="box">✔</span><span>Jackets</span></li>
+              <li><span class="box">✔</span><span>Day bags</span></li>
+              <li><span class="box">✔</span><span>Snacks for the train</span></li>
+              <li><span class="box">✔</span><span>Nyra's essentials</span></li>
+            </ul>
+            <div class="note tip">🍽️ Keep dinner simple tonight, and sleep by 9–10 PM — early travel day tomorrow.</div>
+            <p><b>Easy dinner near home:</b> Le Campanella, 18 Avenue Bosquet, has vegetarian pizza and pasta. Alternatively, buy baguette, cheese, fruit and dessert from Rue Saint-Dominique for a relaxed meal at the apartment.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Le+Campanella+18+Avenue+Bosquet+Paris" target="_blank" rel="noopener">📍 Open Le Campanella in Maps</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ DAY 6 ============ -->
+  <section class="day" id="day6">
+    <div class="day-head">
+      <div class="day-badge"><small>SEP</small><span>6</span></div>
+      <div class="day-title"><h2>🚆 Paris → Interlaken 🇨🇭</h2><p>Sunday · Travel to Switzerland</p></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card open">
+          <div class="card-head"><span class="time-pill">Morning</span><h3>🌅 Check out &amp; head to the station</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Pick up a bakery breakfast and train snacks before leaving.</p>
+            <div class="route"><b>To Gare de Lyon:</b> Metro 8 from École Militaire to Madeleine → change to Metro 14 toward Aéroport d'Orly → Gare de Lyon. Allow 40–45 minutes door-to-platform. With several suitcases, a taxi is still easier.</div>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Breakfast</span></li>
+              <li><span class="box">✔</span><span>Check out</span></li>
+              <li><span class="box">✔</span><span>Final room check (chargers, drawers, safe)</span></li>
+              <li><span class="box">✔</span><span>Passport check</span></li>
+              <li><span class="box">✔</span><span>Head to the Paris train station</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="tl-item"><div class="tl-dot"></div>
+        <div class="card">
+          <div class="card-head"><span class="time-pill">Train</span><h3>🚆 Train to Interlaken</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>I'd recommend a <b>morning departure</b> so you arrive in Interlaken with daylight left to explore.</p>
+            <div class="info-grid">
+              <div class="info-box"><h5>🚉 Route</h5><p>TGV Lyria from <b>Paris Gare de Lyon → Basel</b>, then a Swiss train via Bern to <b>Interlaken Ost</b> (~5.5–6 hrs total, one easy connection).</p></div>
+              <div class="info-box"><h5>💺 Tip</h5><p>Reserve seats early (TGV Lyria requires reservations). Sit on the right after Bern for lake views.</p></div>
+            </div>
+            <div class="note star">⭐ Switzerland &amp; Italy day-by-day plans will be added to the tabs above tomorrow.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ OVERVIEW ============ -->
+  <section class="day" id="overview">
+    <h2 class="section-title">🗺️ Quick View — Full Paris Itinerary</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date</th><th>Morning</th><th>Afternoon</th><th>Evening</th></tr></thead>
+        <tbody>
+          <tr><td><b>Sep 1</b> · Tue</td><td>✈️ Seattle</td><td>✈️ Flight</td><td>✈️ Overnight</td></tr>
+          <tr><td><b>Sep 2</b> · Wed</td><td>🛬 Arrive 1 PM</td><td>🏠 Airbnb + rest</td><td>🗼 Eiffel → 🌉 Pont Alexandre III</td></tr>
+          <tr><td><b>Sep 3</b> · Thu</td><td>📸 Trocadéro</td><td>🏛️ Arc → 🛍️ Champs-Élysées</td><td>🚢 Seine cruise</td></tr>
+          <tr><td><b>Sep 4</b> · Fri</td><td>🖼️ Louvre</td><td>🌳 Tuileries</td><td>🏠 Rest / optional Concorde</td></tr>
+          <tr><td><b>Sep 5</b> · Sat</td><td>🛍️ Galeries Lafayette</td><td>🏛️ Palais Garnier</td><td>🛍️ Shopping → 🧳 Pack</td></tr>
+          <tr><td><b>Sep 6</b> · Sun</td><td>🚆 Paris → Interlaken</td><td>🇨🇭 Arrive Switzerland</td><td>🇨🇭 Interlaken</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="section-title">⭐ Overall Strategy</h2>
+    <div class="info-grid">
+      <div class="info-box"><h5>Sep 2</h5><p>Easy arrival day</p></div>
+      <div class="info-box"><h5>Sep 3</h5><p>Iconic Paris + cruise</p></div>
+      <div class="info-box"><h5>Sep 4</h5><p>Art + garden + relaxation</p></div>
+      <div class="info-box"><h5>Sep 5</h5><p>Shopping + architecture + packing</p></div>
+    </div>
+
+    <h2 class="section-title">🧭 Getting Around Paris</h2>
+    <div class="info-grid">
+      <div class="info-box"><h5>🎫 Navigo Week</h5><p>For both adults, buy <b>Navigo Week zones 1–5</b> (currently €32.40 each). It runs Monday–Sunday, covers Sep 2–6 and includes Metro, bus, tram, RER and eligible CDG travel. Each traveler needs a separate pass/card or compatible phone.</p></div>
+      <div class="info-box"><h5>👧 Nyra's fare</h5><p>Children aged 4 to under 10 receive <b>50% off individual Metro–Train–RER and Bus–Tram tickets</b>; age 4 is not automatically free. Reduced individual tickets will likely cost less than a full weekly pass for her.</p></div>
+      <div class="info-box"><h5>📱 Apps</h5><p><b>Citymapper</b> and <b>Bonjour RATP</b> give live Metro routes. Download Google Maps offline for Paris.</p></div>
+      <div class="info-box"><h5>👛 Watch for</h5><p>Keep bags zipped on the Metro and near tourist spots — pickpockets target crowds around the Eiffel Tower and Louvre.</p></div>
+      <div class="info-box"><h5>🚉 Your useful stops</h5><p><b>École Militaire</b> is your nearest Metro 8 station. Use <b>Bosquet–Grenelle</b> for Bus 92 and <b>Bosquet–Saint-Dominique</b> for Bus 69.</p></div>
+      <div class="info-box"><h5>🚶 Validate every trip</h5><p>Tap the pass when boarding buses/trams and at Metro/RER gates, including transfers. Keep it until the journey ends.</p></div>
+    </div>
+
+    <h2 class="section-title">🌱 Vegetarian Ordering</h2>
+    <div class="info-grid">
+      <div class="info-box"><h5>Say this</h5><p><b>Nous sommes végétariens. Sans viande, sans poisson et sans œuf, s'il vous plaît.</b><br>We are vegetarian. No meat, fish or egg, please.</p></div>
+      <div class="info-box"><h5>Check hidden ingredients</h5><p>Ask about meat/fish stock, egg in fresh pasta and pastries, and animal rennet in cheese. “Végétarien” in France may still include egg and dairy.</p></div>
+      <div class="info-box"><h5>Cuisine mix</h5><p>French bakery/crêperie breakfasts, Mexican at Tío, Italian at Chez Pippo and Capucci, plus Indian at Kamal Shri and the pure-vegetarian Arya Bhavan.</p></div>
+      <div class="info-box"><h5>Reservations</h5><p>Reserve Chez Pippo, Tío and Capucci where possible. Recheck opening hours shortly before the September 2026 trip.</p></div>
+    </div>
+
+    <h2 class="section-title">💡 Family Tips</h2>
+    <div class="info-grid">
+      <div class="info-box"><h5>💧 Water</h5><p>Carry a refillable bottle — Paris has free <b>Wallace fountains</b> with drinkable water.</p></div>
+      <div class="info-box"><h5>🚻 Breaks</h5><p>Plan a mid-afternoon rest at the Airbnb each day. It keeps Nyra (and everyone) happy.</p></div>
+      <div class="info-box"><h5>🍦 Snacks</h5><p>Boulangeries everywhere: croissants, crêpes, and ice cream are easy Nyra-friendly wins.</p></div>
+      <div class="info-box"><h5>🎟️ Book ahead</h5><p>Reserve the Louvre and Seine cruise online in advance to skip long queues.</p></div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<main class="destination-view" data-view="switzerland">
+  <div class="hero">
+    <div class="hero-card">
+      <img src="assets/images/hero-switzerland.jpg" alt="Swiss Alps near Interlaken" />
+      <div class="hero-overlay">
+        <h1>🇨🇭 Switzerland Travel Itinerary</h1>
+        <div class="hero-meta">
+          <span class="chip">📅 <b>Sep 6–10, 2026</b></span>
+          <span class="chip">👨‍👩‍👧 <b>2 Adults + Nyra (4)</b></span>
+          <span class="chip">➡️ Next: <b>Rome 🇮🇹</b></span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="swissProgressFill"></div></div>
+          <div class="progress-label" id="swissProgressLabel">Tick off experiences as you go</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="daynav">
+    <a class="daylink" href="#swiss-day0"><small>Sun</small>Sep 6<small>Arrival</small></a>
+    <a class="daylink" href="#swiss-day1"><small>Mon</small>Sep 7<small>Grindelwald</small></a>
+    <a class="daylink" href="#swiss-day2"><small>Tue</small>Sep 8<small>Relax</small></a>
+    <a class="daylink" href="#swiss-day3"><small>Wed</small>Sep 9<small>Mountain day</small></a>
+    <a class="daylink" href="#swiss-day4"><small>Thu</small>Sep 10<small>→ Rome</small></a>
+    <a class="daylink" href="#swiss-passes"><small>Recap</small>Overview<small>Passes &amp; tips</small></a>
+  </nav>
+  <div class="wrap">
+    <section class="day" id="swiss-day0">
+      <div class="day-head">
+        <div class="day-badge"><small>SEP</small><span>6</span></div>
+        <div class="day-title"><h2>🌊 Arrival Day — Lake Thun + Harder Kulm</h2><p>Sunday · Moderate arrival day</p></div>
+      </div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="card open">
+          <div class="card-head"><span class="time-pill">2:00–3:10 PM</span><h3>🚆 Arrive, check in &amp; quick lunch</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Arrive in Interlaken around <b>2:00–2:30 PM</b>, leave luggage at the hotel, and finish a quick lunch by 3:10 PM.</p>
+            <div class="gallery"><img loading="lazy" src="assets/images/swiss-interlaken.jpg" alt="Interlaken and the Alps" /></div>
+            <div class="info-grid">
+              <div class="info-box"><h5>🥗 Fast vegetarian lunch</h5><p>Use the station or hotel area for a cheese/vegetable sandwich, rösti or takeaway bowl. A long sit-down meal risks the boat.</p></div>
+              <div class="info-box"><h5>🧳 Arrival strategy</h5><p>Keep jackets, water and boat tickets in the day bag so you do not need to unpack before leaving again.</p></div>
+            </div>
+            <div class="note tip"><b>Planning time:</b> your exact arrival depends on the Paris–Interlaken booking. If you reach Interlaken after 3:00 PM, recheck whether the Lake Thun sailing remains possible.</div>
+          </div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">3:10–5:45 PM</span><h3>🚢 Lake Thun Cruise</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Walk to <b>Interlaken West</b> from 3:10–3:25 PM, use 3:25–3:45 PM for boarding, then cruise from approximately 3:45–5:45 PM.</p>
+            <div class="route"><b>Route:</b> hotel → Interlaken West boat landing → Lake Thun cruise → return toward Interlaken.</div>
+            <div class="gallery"><img loading="lazy" src="assets/images/swiss-lake-thun.jpg" alt="Lake Thun and surrounding mountains" /></div>
+            <h4>✅ What to enjoy</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Turquoise water and mountain panorama</span></li>
+              <li><span class="box">✔</span><span>Lakeside villages and castle views</span></li>
+              <li><span class="box">✔</span><span>Outdoor deck family photos</span></li>
+              <li><span class="box">✔</span><span>Warm layer for the breezy deck</span></li>
+            </ul>
+            <div class="info-grid">
+              <div class="info-box"><h5>🎟️ Tickets</h5><p>Lake Thun boats are generally included with the Jungfrau Travel Pass during its validity. Confirm the exact 2026 coverage and sailing before boarding.</p></div>
+              <div class="info-box"><h5>👧 With Nyra</h5><p>Use indoor seating if it becomes cold. Stay together on exterior decks and keep her away from railings.</p></div>
+            </div>
+            <h4>📖 A little background</h4>
+            <p>Lake Thun lies west of Interlaken between the Bernese Alps and the city of Thun. Passenger steamers and motor vessels have linked its resort towns since the 19th century.</p>
+          </div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">5:45–7:15 PM</span><h3>🏔️ Harder Kulm</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Return toward the Harderbahn by 6:00 PM, ride the funicular up around 6:00–6:10 PM, enjoy the summit until 7:05 PM, then descend by about 7:15 PM.</p>
+            <div class="gallery"><img loading="lazy" src="assets/images/swiss-harder-kulm.jpg" alt="Harder Kulm panorama above Interlaken" /></div>
+            <h4>✅ Don't miss</h4>
+            <ul class="checklist">
+              <li><span class="box">✔</span><span>Two-Lakes Bridge viewpoint</span></li>
+              <li><span class="box">✔</span><span>Lake Thun and Lake Brienz in one panorama</span></li>
+              <li><span class="box">✔</span><span>Eiger, Mönch and Jungfrau skyline</span></li>
+              <li><span class="box">✔</span><span>Family photos before the last descent</span></li>
+            </ul>
+            <div class="note warn"><b>Last descent matters:</b> verify the Sep 6 Harderbahn timetable. Do not rely on the planning times if the seasonal schedule changes.</div>
+            <h4>📖 A little background</h4>
+            <p>Harder Kulm is Interlaken's local viewpoint at 1,322 m. The funicular has climbed from the valley since 1908 and reaches the summit area in about ten minutes.</p>
+          </div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">7:15 PM onward</span><h3>🍽️ Vegetarian dinner &amp; relax</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Try <b>Layaly Beirut</b> for mezze and falafel or <b>Pizzeria Horn</b> for vegetarian pizza. Both are useful family options after Harder Kulm; recheck Sunday kitchen hours.</p>
+            <a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=vegetarian+restaurants+Interlaken+Switzerland" target="_blank" rel="noopener">📍 Vegetarian restaurants in Interlaken</a>
+          </div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">If time</span><h3>🚶 Yash Chopra Walk</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Add only a short section if check-in and transport run early. Keep it out of the core schedule so Lake Thun and Harder Kulm remain protected.</p></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="day" id="swiss-day1">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>7</span></div><div class="day-title"><h2>🏔️ Grindelwald + First Day</h2><p>Monday · Very busy mountain day</p></div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="card open">
+          <div class="card-head"><span class="time-pill">7:30–8:55 AM</span><h3>🍳 Breakfast + train to Grindelwald</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Eat from 7:30–8:00 AM, take the train from <b>Interlaken Ost around 8:00 AM</b>, arrive Grindelwald near 8:35 AM, then walk about 15 minutes to Pfingsteggbahn.</p><div class="route"><b>Planning route:</b> Interlaken Ost → Grindelwald station → Pfingsteggbahn valley station. Verify the live BOB departure in SBB Mobile.</div><div class="note tip"><b>Pack now:</b> water, sun protection, warm layers, rain shells, snacks and a child carrier for Bachalpsee.</div></div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">9:00–10:40 AM</span><h3>🛷 Pfingstegg Toboggan</h3><span class="toggle">▾</span></div>
+          <div class="card-body">
+            <p>Ride the cable car from Grindelwald to Pfingstegg around 9:00–9:05 AM, enjoy the toboggan and views until 10:30 AM, then descend by about 10:40 AM.</p>
+            <div class="gallery"><img loading="lazy" src="assets/images/swiss-grindelwald.jpg" alt="Grindelwald beneath the Alps" /></div>
+            <h4>✅ At Pfingstegg</h4><ul class="checklist"><li><span class="box">✔</span><span>Check weather and toboggan operation</span></li><li><span class="box">✔</span><span>Buy the correct ride/cable-car tickets</span></li><li><span class="box">✔</span><span>Enjoy the mountain and glacier views</span></li><li><span class="box">✔</span><span>Allow time for the return queue</span></li></ul>
+            <div class="note tip">👧 <b>With Nyra:</b> she may ride with an accompanying adult under the attraction's current child rules. Reconfirm those rules and weather operation before buying.</div>
+            <h4>📖 A little background</h4><p>Pfingstegg is a terrace above Grindelwald reached by a short aerial cableway. Its summer toboggan curves through alpine meadow with views toward the Lower Grindelwald Glacier valley.</p>
+          </div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">10:40 AM–12:10 PM</span><h3>🏘️ Grindelwald village + lunch</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Use 10:40–11:25 AM for the village, then take a focused 45-minute lunch before walking to the First gondola at 12:10 PM.</p><div class="info-grid"><div class="info-box"><h5>🥗 Lunch</h5><p>Try <b>C und M Café Bar Restaurant</b> for a vegetarian plate, soup or pasta. <b>Avocado Bar</b> is a casual backup.</p></div><div class="info-box"><h5>🏘️ Village time</h5><p>Walk the main street, photograph the Eiger backdrop and refill water. Avoid shopping detours that delay the gondola.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=vegetarian+restaurants+Grindelwald+Switzerland" target="_blank" rel="noopener">📍 Vegetarian lunch options in Grindelwald</a><h4>📖 A little background</h4><p>Grindelwald developed from a farming settlement into one of Switzerland's earliest alpine tourism centers. It sits directly below the dramatic north face of the Eiger.</p></div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">12:10–1:50 PM</span><h3>🚠 Grindelwald First + Cliff Walk</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Walk to the gondola from 12:10–12:25 PM, ride via Bort and Schreckfeld to First by about 12:55 PM, spend 25 minutes around First View, then allow roughly 30 minutes for the Cliff Walk.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-first.jpg" alt="Mountain scenery at Grindelwald First" /></div><h4>✅ Explore</h4><ul class="checklist"><li><span class="box">✔</span><span>First View platform and Eiger panorama</span></li><li><span class="box">✔</span><span>Cliff Walk suspension section</span></li><li><span class="box">✔</span><span>Elevated viewing platform</span></li><li><span class="box">✔</span><span>Check last gondola before hiking</span></li></ul><div class="note warn">👧 <b>Nyra's restrictions:</b> First Flyer, First Glider and First Mountain Cart are not suitable under current age/height rules. Adult accompaniment does not override them.</div><h4>📖 A little background</h4><p>First is a mountain ridge above Grindelwald at 2,168 m. The cliff-side walkway follows the rock face to a viewing platform overlooking the Bernese Alps.</p></div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">1:50–3:50 PM</span><h3>🥾 Bachalpsee return hike</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Allow about two hours for the out-and-back walk from First. The path is broad but climbs and undulates at altitude; pace it for Nyra rather than adult hiking speed.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-bachalpsee.jpg" alt="Bachalpsee alpine lake" /></div><h4>✅ At the lake</h4><ul class="checklist"><li><span class="box">✔</span><span>Mountain reflections if the water is calm</span></li><li><span class="box">✔</span><span>Short snack and water break</span></li><li><span class="box">✔</span><span>Family photo without approaching marshy edges</span></li><li><span class="box">✔</span><span>Turn back early enough for the gondola</span></li></ul><div class="info-grid"><div class="info-box"><h5>👧 With Nyra</h5><p>Bring a suitable carrier. A four-year-old may not sustain the full return hike after Pfingstegg and the Cliff Walk.</p></div><div class="info-box"><h5>🌦️ Conditions</h5><p>Skip or shorten the hike in thunderstorms, strong wind, poor visibility or if the trail is slippery.</p></div></div><h4>📖 A little background</h4><p>Bachalpsee is a pair of small alpine lakes at 2,265 m. On clear, still days they reflect the Schreckhorn and surrounding peaks.</p></div>
+        </div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill">3:50 PM onward</span><h3>🚠 Descend + Wengen if energy permits</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><p>Ride First → Grindelwald from roughly 3:50–4:20 PM. Add Wengen only if everyone has energy and the live timetable leaves a comfortable return; otherwise go directly to Interlaken.</p><div class="route"><b>Core return:</b> First → Grindelwald → Interlaken Ost. <b>Long extension:</b> Grindelwald → Zweilütschinen → Lauterbrunnen → Wengen → Interlaken.</div><div class="note warn"><b>Do not add Männlichen + Royal Walk.</b> The day is already long and the operating window is too tight.</div><p><b>Dinner in Interlaken:</b> choose vegetarian rösti/fondue if available, or a Thai vegetable curry at Little Thai. Verify the kitchen's closing time.</p></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="day" id="swiss-day2">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>8</span></div><div class="day-title"><h2>🌊 Relax Day — Aare Gorge + Lake Brienz</h2><p>Tuesday · Recovery day between mountain days</p></div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="card open"><div class="card-head"><span class="time-pill">8:00–9:15 AM</span><h3>🍳 Breakfast + journey to Aare Gorge</h3><span class="toggle">▾</span></div><div class="card-body"><p>Eat from 8:00–8:30 AM, travel Interlaken Ost → Meiringen around 8:30–9:05 AM, then take the short local train to <b>Aareschlucht West</b> by about 9:15 AM.</p><div class="route"><b>Route:</b> Interlaken Ost → Meiringen → Aareschlucht West. Check whether the small local train is operating on your date.</div></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">9:30–10:45 AM</span><h3>🥾 Complete Aare Gorge — West to East</h3><span class="toggle">▾</span></div><div class="card-body"><p>Walk the complete gorge from the west entrance to the east entrance from approximately 9:30–10:30 AM, then connect back toward Meiringen by about 10:45 AM.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-aare-gorge.jpg" alt="Rock walls inside Aare Gorge" /></div><h4>✅ Along the gorge</h4><ul class="checklist"><li><span class="box">✔</span><span>Narrow limestone walls and turquoise river</span></li><li><span class="box">✔</span><span>Boardwalks and tunnels through the rock</span></li><li><span class="box">✔</span><span>Complete West → East route</span></li><li><span class="box">✔</span><span>Keep a waterproof layer handy</span></li></ul><div class="note tip">👧 <b>With Nyra:</b> paths are secured but can be wet, narrow and dim. Hold hands, use closed shoes and avoid a bulky stroller.</div><h4>📖 A little background</h4><p>The Aare River carved this approximately 1.4 km gorge through limestone over thousands of years. In places, the cliffs rise nearly 200 m while the passage narrows to only a few meters.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">10:45 AM–12:00 PM</span><h3>🚆 Return + early lunch buffer</h3><span class="toggle">▾</span></div><div class="card-body"><p>Travel Aareschlucht → Meiringen around 10:30–10:45 AM and Meiringen → Interlaken Ost around 10:45–11:15 AM. Use the remaining time to transfer and buy lunch before the boat.</p><div class="note star"><b>Protect the cruise:</b> buy a vegetarian sandwich or picnic at Interlaken Ost rather than waiting for table service.</div></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">12:07–1:20 PM</span><h3>🚢 Lake Brienz Cruise</h3><span class="toggle">▾</span></div><div class="card-body"><p>Take the planning sailing from <b>Interlaken Ost to Brienz</b>, approximately 1 hour 13 minutes. Confirm the final September 2026 departure before relying on 12:07 PM.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-lake-brienz.jpg" alt="Turquoise Lake Brienz" /></div><h4>✅ Enjoy</h4><ul class="checklist"><li><span class="box">✔</span><span>Distinctive turquoise glacial water</span></li><li><span class="box">✔</span><span>Giessbach-side mountain scenery</span></li><li><span class="box">✔</span><span>Picnic or snack aboard</span></li><li><span class="box">✔</span><span>Indoor seating if the deck is cold</span></li></ul><h4>📖 A little background</h4><p>Lake Brienz occupies the eastern side of Interlaken. Fine glacial sediment suspended in the water gives the lake its vivid turquoise color.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">1:20 PM onward</span><h3>🍽️ Lunch, lake rest &amp; free afternoon</h3><span class="toggle">▾</span></div><div class="card-body"><p>Have lunch from 1:20–2:15 PM, relax beside Lake Brienz until about 3:00 PM, then keep the rest of the afternoon free.</p><div class="info-grid"><div class="info-box"><h5>🍽️ Brienz lunch</h5><p>Check Restaurant Steinbock for vegetarian rösti or pasta, or use a lakefront restaurant close to the station.</p></div><div class="info-box"><h5>😌 Recovery</h5><p>Do not turn Brienz village into another required attraction. Return to Interlaken when everyone is ready.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=vegetarian+restaurants+Brienz+Switzerland" target="_blank" rel="noopener">📍 Vegetarian lunch options in Brienz</a><p><b>Dinner:</b> choose Swiss, Italian, Thai or an Indian vegetarian comfort meal in Interlaken. Keep the evening early before Jungfraujoch.</p></div></div></div>
+      </div>
+    </section>
+
+    <section class="day" id="swiss-day3">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>9</span></div><div class="day-title"><h2>🏔️ Jungfraujoch + Lauterbrunnen + Mürren + Schilthorn</h2><p>Wednesday · Very busy high-alpine day</p></div></div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="card open"><div class="card-head"><span class="time-pill">6:15–8:15 AM</span><h3>🚆 Early journey to Jungfraujoch</h3><span class="toggle">▾</span></div><div class="card-body"><p>Wake and eat at 6:15 AM. Travel Interlaken Ost → Grindelwald Terminal from about 6:45–7:15 AM, keep 15 minutes for the transfer, ride the Eiger Express to Eigergletscher from 7:30–7:45 AM, then take the mountain railway to Jungfraujoch by about 8:15 AM.</p><div class="route"><b>Route:</b> Interlaken Ost → Grindelwald Terminal → Eiger Express → Eigergletscher → Jungfraujoch.</div><div class="note warn"><b>Planning times only:</b> this sequence depends on the final September 2026 timetable. Reserve/confirm the Jungfraujoch connection and arrive before boarding.</div></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">8:15–10:45 AM</span><h3>🏔️ Jungfraujoch — Top of Europe</h3><span class="toggle">▾</span></div><div class="card-body"><p>Spend about 2.5 hours at 3,454 m. Follow the signed indoor route, then use the outdoor Glacier Plateau only when conditions are safe.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-jungfraujoch.jpg" alt="Snow-covered peaks near Jungfraujoch" /></div><h4>⭐ Focus on the highlights</h4><ul class="checklist"><li><span class="box">✔</span><span>Ice Palace sculptures and tunnels</span></li><li><span class="box">✔</span><span>Sphinx observation deck</span></li><li><span class="box">✔</span><span>Aletsch Glacier views</span></li><li><span class="box">✔</span><span>Glacier Plateau for Nyra's snow/ice experience</span></li></ul><div class="info-grid"><div class="info-box"><h5>🎟️ Ticket</h5><p>The Jungfrau Travel Pass does not fully include Jungfraujoch. The summer 2026 connecting ticket is listed at CHF 89 per adult; this is transportation, not a deck fee.</p></div><div class="info-box"><h5>👧 Altitude &amp; Nyra</h5><p>Move slowly, hydrate and keep the outdoor visit short. Descend promptly if anyone develops headache, nausea, dizziness or unusual fatigue.</p></div></div><h4>📖 A little background</h4><p>The Jungfrau Railway opened in 1912 after 16 years of construction through the Eiger and Mönch. Jungfraujoch remains Europe's highest railway station.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">10:45 AM–12:30 PM</span><h3>🚠 Descend to Lauterbrunnen</h3><span class="toggle">▾</span></div><div class="card-body"><p>Take the railway Jungfraujoch → Eigergletscher from roughly 10:45–11:15 AM, Eiger Express to Grindelwald Terminal by 11:30 AM, then trains via Zweilütschinen to Lauterbrunnen by about 12:30 PM.</p><div class="note tip"><b>Food strategy:</b> carry a packed vegetarian lunch, water and snacks. This day has no dependable leisurely restaurant window.</div></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">12:30–1:15 PM</span><h3>💦 Lauterbrunnen + Staubbach Falls</h3><span class="toggle">▾</span></div><div class="card-body"><p>Use 45 minutes for the village edge, Staubbach Falls viewpoint and photos before continuing to Mürren.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-lauterbrunnen.jpg" alt="Lauterbrunnen valley and waterfalls" /></div><h4>✅ Look for</h4><ul class="checklist"><li><span class="box">✔</span><span>Staubbach Falls dropping from the cliff</span></li><li><span class="box">✔</span><span>Valley walls and alpine meadows</span></li><li><span class="box">✔</span><span>Quick family photos</span></li><li><span class="box">✔</span><span>Reach the Grütschalp connection on time</span></li></ul><h4>📖 A little background</h4><p>Lauterbrunnen means “many fountains.” Its U-shaped glacial valley contains 72 waterfalls; Staubbach Falls drops nearly 300 m from the cliff above the village.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">1:15–2:35 PM</span><h3>🚠 Grütschalp route + Mürren</h3><span class="toggle">▾</span></div><div class="card-body"><p>Travel Lauterbrunnen → Grütschalp → Mürren from about 1:15–1:45 PM, then spend 50 minutes walking the car-free village and enjoying views across to the Eiger, Mönch and Jungfrau.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-murren.jpg" alt="Mürren village in the Bernese Alps" /></div><div class="info-grid"><div class="info-box"><h5>🏘️ Village walk</h5><p>Keep close to the station/cableway axis. Admire chalets and viewpoints without taking a long side trail.</p></div><div class="info-box"><h5>🍲 Quick food</h5><p>Use quick service only if connections permit. Confirm soup and sauce contain no meat stock.</p></div></div><h4>📖 A little background</h4><p>Mürren is a car-free village on a sunny terrace at 1,638 m. It became an early center of British winter sports and hosted the first Alpine Ski World Championships in 1931.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">2:35–3:35 PM</span><h3>🌲 Gimmelwald — only if on time</h3><span class="toggle">▾</span></div><div class="card-body"><p>If the day is running exactly to plan, ride Mürren → Gimmelwald around 2:35–2:45 PM, spend about 40 minutes at the village and Honesty Shop, then return to Mürren by 3:35 PM.</p><div class="note warn"><b>First thing to remove:</b> if tired or behind schedule, skip Gimmelwald and go directly from Mürren toward Schilthorn.</div><h4>📖 A little background</h4><p>Gimmelwald is a small, traditional farming village on the cliff terrace below Mürren. Its compact lanes and self-service Honesty Shop preserve a quieter side of the region.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">3:35–5:45 PM</span><h3>🏔️ Schilthorn</h3><span class="toggle">▾</span></div><div class="card-body"><p>Ride Mürren → Birg → Schilthorn in about 30–40 minutes, then spend approximately 4:15–5:45 PM at the summit.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-schilthorn.jpg" alt="Schilthorn mountain panorama" /></div><h4>✅ Explore</h4><ul class="checklist"><li><span class="box">✔</span><span>360° panorama from the observation deck</span></li><li><span class="box">✔</span><span>Eiger, Mönch and Jungfrau views</span></li><li><span class="box">✔</span><span>Bond World exhibition</span></li><li><span class="box">✔</span><span>Check last cable car before exploring</span></li></ul><div class="note star"><b>Weather rule:</b> summit views can disappear completely in cloud. Check webcams and cableway status before committing to the ascent.</div><h4>📖 A little background</h4><p>Schilthorn rises to 2,970 m. Its revolving summit restaurant became famous as Piz Gloria in the 1969 James Bond film <i>On Her Majesty's Secret Service</i>.</p></div></div></div>
+
+        <div class="tl-item"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">5:45–7:25 PM</span><h3>🚠 Return to Interlaken</h3><span class="toggle">▾</span></div><div class="card-body"><p>Descend Schilthorn → Mürren by about 6:20 PM, continue Mürren → Grütschalp → Lauterbrunnen by 6:50 PM, then take the train around 7:00–7:20 PM and reach Interlaken near 7:25 PM.</p><div class="route"><b>Return:</b> Schilthorn → Birg → Mürren → Grütschalp → Lauterbrunnen → Interlaken Ost.</div><p><b>Dinner after 7:30 PM:</b> reserve near Interlaken Ost or your hotel because some kitchens may close shortly after your return.</p><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=late+dinner+vegetarian+Interlaken+Switzerland" target="_blank" rel="noopener">📍 Late vegetarian dinner near Interlaken</a></div></div></div>
+      </div>
+    </section>
+
+    <section class="day" id="swiss-day4">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>10</span></div><div class="day-title"><h2>🇮🇹 Switzerland → Rome</h2><p>Thursday · Departure day</p></div></div>
+      <div class="timeline"><div class="tl-item"><div class="tl-dot"></div><div class="card open"><div class="card-head"><span class="time-pill">6:00 AM onward</span><h3>🧳 Check out + train to Rome</h3><span class="toggle">▾</span></div><div class="card-body"><p>Wake at 6:00 AM, eat from 6:00–6:30 AM, and check out with luggage from 6:30–7:00 AM. Leave Interlaken according to the confirmed Rome connection.</p><div class="gallery"><img loading="lazy" src="assets/images/swiss-rome-train.jpg" alt="Train through the Swiss Alps" /><img loading="lazy" src="assets/images/swiss-interlaken.jpg" alt="Departing Interlaken" /></div><div class="info-grid"><div class="info-box"><h5>🚆 Departure</h5><p>The current 7:00 AM time is only a planning target. Use the booked route and allow time for every Swiss/Italian transfer.</p></div><div class="info-box"><h5>🥪 Train food</h5><p>Buy vegetarian sandwiches, fruit, yogurt and snacks the previous evening. Early station choices may be limited.</p></div></div><ul class="checklist"><li><span class="box">✔</span><span>Passports and Rome tickets</span></li><li><span class="box">✔</span><span>Hotel room and charger check</span></li><li><span class="box">✔</span><span>Breakfast and train snacks</span></li><li><span class="box">✔</span><span>Reach Interlaken station before the booked train</span></li></ul><div class="note star"><b>Departure time depends on the booked Rome connection.</b> Do not hardcode 7:00 AM until the international itinerary is confirmed.</div></div></div></div></div>
+    </section>
+
+    <section class="day" id="swiss-passes">
+      <h2 class="section-title">🗺️ Quick View — Switzerland</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Date</th><th>Core route</th><th>Intensity</th><th>First cut if late</th></tr></thead>
+          <tbody>
+            <tr><td><b>Sep 6</b> · Sun</td><td>Lake Thun → Harder Kulm</td><td>Moderate</td><td>Yash Chopra Walk</td></tr>
+            <tr><td><b>Sep 7</b> · Mon</td><td>Grindelwald → Pfingstegg → First → Bachalpsee</td><td>Very Busy</td><td>Wengen</td></tr>
+            <tr><td><b>Sep 8</b> · Tue</td><td>Aare Gorge → Lake Brienz</td><td>Relaxed</td><td>Keep free afternoon</td></tr>
+            <tr><td><b>Sep 9</b> · Wed</td><td>Jungfraujoch → Lauterbrunnen → Mürren → Schilthorn</td><td>Very Busy</td><td>Gimmelwald</td></tr>
+            <tr><td><b>Sep 10</b> · Thu</td><td>Interlaken → Rome</td><td>Departure</td><td>Use booked connection</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h2 class="section-title">🎟️ Switzerland Tickets &amp; Passes</h2>
+      <div class="info-grid">
+        <div class="info-box"><h5>Jungfrau Travel Pass</h5><p>Generally covers many Jungfrau-region trains, cable cars and boats, including Grindelwald–First, Harder Kulm, Lake Thun/Brienz boats and relevant regional transport. Confirm the exact 2026 validity map before buying.</p></div>
+        <div class="info-box"><h5>Jungfraujoch supplement</h5><p>Jungfraujoch is <b>not fully included</b>. With a Jungfrau Travel Pass, the May 1–Oct 31 connecting ticket is currently listed as <b>CHF 89 per adult</b> for summer 2026. This is transportation to Jungfraujoch, not an observation-deck fee.</p></div>
+        <div class="info-box"><h5>Attractions at the top</h5><p>Once you hold the required Jungfraujoch access ticket, Ice Palace, Sphinx/Observation Deck and Glacier Plateau are included.</p></div>
+        <div class="info-box"><h5>Separate costs/checks</h5><p>Confirm Pfingstegg Toboggan pricing, Schilthorn coverage, seat reservations and any pass supplements directly before purchase. Operations remain weather-dependent.</p></div>
+      </div>
+      <div class="note warn"><b>Timetable warning:</b> all times in this Switzerland plan are estimates. Recheck every train, boat, funicular and cableway against the final September 2026 timetable and seasonal operating dates.</div>
+      <h2 class="section-title">🧭 Getting Around</h2>
+      <div class="info-grid">
+        <div class="info-box"><h5>SBB Mobile</h5><p>Use the SBB Mobile app for platform numbers and live connections. For mountain legs, also verify the operator's own timetable and last descent.</p></div>
+        <div class="info-box"><h5>Validate coverage</h5><p>Before boarding, confirm whether the exact train, boat, gondola or funicular is fully included, discounted or requires a supplement/reservation.</p></div>
+        <div class="info-box"><h5>Weather rule</h5><p>Check webcams each morning. Do not spend summit-ticket money when peaks are fully clouded unless the indoor attractions alone justify it.</p></div>
+        <div class="info-box"><h5>Connections</h5><p>Swiss transfers are designed to be efficient, but this plan needs punctual departures. Move to the platform/cableway before the listed boarding time.</p></div>
+      </div>
+      <h2 class="section-title">👧 Nyra's Mountain Rules</h2>
+      <div class="info-grid">
+        <div class="info-box"><h5>Allowed with adult</h5><p>Pfingstegg Toboggan can be ridden with an accompanying adult under the attraction's child rules. Reconfirm before travel.</p></div>
+        <div class="info-box"><h5>Not suitable currently</h5><p>First Flyer, First Glider and First Mountain Cart do not meet Nyra's current age/height eligibility. Adult accompaniment does not make these permitted.</p></div>
+        <div class="info-box"><h5>Snow experience</h5><p>At Jungfraujoch, the Glacier Plateau is the planned place for Nyra to experience snow and ice.</p></div>
+        <div class="info-box"><h5>Hiking</h5><p>Bachalpsee is a substantial outing for a four-year-old. Carry water, layers and a suitable child carrier; turn around if conditions or energy deteriorate.</p></div>
+      </div>
+      <h2 class="section-title">🎒 Family Mountain Kit</h2>
+      <div class="info-grid">
+        <div class="info-box"><h5>Layers</h5><p>Pack warm mid-layers, waterproof shells, hats, gloves and spare socks even when Interlaken is warm.</p></div>
+        <div class="info-box"><h5>Sun &amp; hydration</h5><p>Bring sunglasses, high-SPF sunscreen, lip balm and refillable water bottles. UV exposure is stronger at altitude.</p></div>
+        <div class="info-box"><h5>Food</h5><p>Carry familiar vegetarian snacks every day. Day 3 especially cannot depend on a leisurely restaurant stop.</p></div>
+        <div class="info-box"><h5>Reservations</h5><p>Book or verify Jungfraujoch access, any required seat reservation, Pfingstegg Toboggan operation and the Sep 10 Rome connection.</p></div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<main class="destination-view" data-view="italy">
+  <div class="hero">
+    <div class="hero-card">
+      <img src="assets/images/hero-rome.jpg" alt="Colosseum and Rome, Italy" />
+      <div class="hero-overlay">
+        <h1>🇮🇹 Rome Travel Itinerary</h1>
+        <div class="hero-meta">
+          <span class="chip">📅 <b>Sep 11–13, 2026</b></span>
+          <span class="chip">👨‍👩‍👧 <b>2 Adults + Nyra (4)</b></span>
+          <span class="chip">🏨 <b>Via delle Terme di Tito 92</b></span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="romeProgressFill"></div></div>
+          <div class="progress-label" id="romeProgressLabel">Rome progress: 0 / 10 must-do attractions completed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <nav class="daynav">
+    <a class="daylink" href="#rome-day1"><small>Fri</small>Sep 11<small>Ancient Rome</small></a>
+    <a class="daylink" href="#rome-day2"><small>Sat</small>Sep 12<small>Vatican</small></a>
+    <a class="daylink" href="#rome-day3"><small>Sun</small>Sep 13<small>Departure</small></a>
+    <a class="daylink" href="#rome-overview"><small>Recap</small>Overview<small>Tickets &amp; tips</small></a>
+  </nav>
+  <div class="rome-tools">
+    <div class="filter-group" aria-label="Rome attraction priority filters">
+      <button class="filter-btn active" data-rome-filter="priority" data-value="all">All stops</button>
+      <button class="filter-btn" data-rome-filter="priority" data-value="must">⭐ Must Do</button>
+      <button class="filter-btn" data-rome-filter="priority" data-value="recommended">🟡 Recommended</button>
+      <button class="filter-btn" data-rome-filter="priority" data-value="optional">⚪ Optional</button>
+    </div>
+    <div class="filter-group" aria-label="Rome transportation filters">
+      <button class="filter-btn active" data-rome-filter="transport" data-value="all">All travel</button>
+      <button class="filter-btn" data-rome-filter="transport" data-value="walk">🚶 Walking</button>
+      <button class="filter-btn" data-rome-filter="transport" data-value="transit">🚇 Transport</button>
+      <button class="filter-btn" data-rome-filter="transport" data-value="taxi">🚕 Taxi</button>
+      <button class="filter-btn" data-rome-filter="transport" data-value="ticket">🎟️ Ticket</button>
+    </div>
+    <button class="fatigue-btn" id="romeFatigueBtn" type="button">🧒 Nyra Friendly Mode</button>
+    <div class="time-adjust"><span>Day 1 start</span><button id="romeTimeEarlier" type="button" title="Shift Day 1 15 minutes earlier">−</button><b id="romeTimeShift">9:00 AM</b><button id="romeTimeLater" type="button" title="Shift Day 1 15 minutes later">+</button></div>
+  </div>
+  <div class="wrap">
+    <section class="day" id="rome-day1">
+      <div class="day-head">
+        <div class="day-badge"><small>SEP</small><span>11</span></div>
+        <div class="day-title"><h2>🏛️ Ancient Rome + Historic Center</h2><p>Friday · Primarily walking</p></div>
+      </div>
+      <div class="note fatigue-note tip"><b>Nyra Friendly Mode:</b> optional stops are hidden. Keep gelato/rest time, use the shortest route, and take Metro A → B or a taxi home if the final walk is too much.</div>
+      <div class="route"><b>Walking route:</b> Hotel → Colosseum → Roman Forum → Palatine Hill → lunch → Vittoriano → Piazza Venezia → Pantheon → Piazza Navona → Trevi Fountain → Spanish Steps → Hotel. Expect roughly <b>8–10 km total</b>, including walking inside the archaeological sites, and about <b>2–2.5 hours of walking</b> separate from visits.</div>
+      <div class="timeline">
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card open">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="480" data-end="520">8:00–8:40 AM</span><h3>🍝 Breakfast near the hotel</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🧒 Kid-friendly</span><span class="activity-tag">🍝 Food</span></div><p>Wake and get ready at 7:30 AM, then have a 40-minute breakfast near Via delle Terme di Tito. Choose cornetti, bread, fruit, yogurt or a savory vegetarian panino.</p><div class="info-grid"><div class="info-box"><h5>🏨 Hotel advantage</h5><p>Your address is extremely close to the Colosseum. Leave around 8:40 AM and walk approximately 5–10 minutes.</p></div><div class="info-box"><h5>🎒 Carry</h5><p>Water, sun hats, comfortable closed shoes and a compact stroller or carrier for Nyra.</p></div></div></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk ticket"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="540" data-end="660">9:00–11:00 AM</span><h3>🏟️ Colosseum</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">🎟️ Timed ticket</span><span class="activity-tag">🧒 Kid-friendly</span></div><p>Target a <b>9:00 AM timed entry</b>. Allow two hours for security, the arena viewpoints and exhibits. Choose an official ticket that also includes the Roman Forum and Palatine Hill.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-colosseum.jpg" alt="The Colosseum in Rome" /></div><h4>⭐ What to notice</h4><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Complete the Colosseum visit</span></li><li><span class="box">✔</span><span>Hypogeum passages below the arena</span></li><li><span class="box">✔</span><span>Tiered seating and imperial box sightline</span></li><li><span class="box">✔</span><span>Arch construction and surviving travertine</span></li></ul><div class="info-grid"><div class="info-box"><h5>🎟️ Booking</h5><p>Use the official Colosseum ticketing channel. Verify the current 2026 price, entry rules and whether a free child reservation is required.</p></div><div class="info-box"><h5>👧 With Nyra</h5><p>Tell the story as an ancient sports stadium. Expect stairs, uneven surfaces, sun and limited shade.</p></div></div><h4>📖 A little history</h4><p>The Flavian emperors built the amphitheater beginning under Vespasian around AD 72; Titus inaugurated it in AD 80. It held tens of thousands for gladiatorial contests, hunts and public spectacles.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk ticket"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="660" data-end="750">11:00 AM–12:30 PM</span><h3>🏛️ Roman Forum + Palatine Hill</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">🎟️ Combined ticket</span></div><p>Enter the archaeological park directly after the Colosseum. Use approximately 90 minutes for a focused route through the Forum and up Palatine Hill rather than attempting every ruin.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-forum.jpg" alt="Ruins of the Roman Forum" /><img loading="lazy" src="assets/images/rome-palatine.jpg" alt="Palatine Hill archaeological ruins" /></div><h4>⭐ Focus on</h4><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Roman Forum</span></li><li data-rome-must><span class="box">✔</span><span>Palatine Hill</span></li><li><span class="box">✔</span><span>Arch of Titus and Via Sacra</span></li><li><span class="box">✔</span><span>Temple and Senate House viewpoints</span></li><li><span class="box">✔</span><span>Palatine terrace over the Circus Maximus</span></li></ul><div class="note tip">👧 <b>With Nyra:</b> the terrain is cobbled, dusty and hilly. Use a carrier rather than relying solely on a stroller, and shorten the Palatine loop if needed.</div><h4>📖 A little history</h4><p>The Forum was ancient Rome's civic, religious and political center. Palatine Hill, associated with Rome's legendary founder Romulus, later became the location of vast imperial palaces; “palace” derives from Palatine.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="750" data-end="810">12:30–1:30 PM</span><h3>🍝 Lunch near Monti / Colosseum</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🍝 Food</span><span class="activity-tag">🍦 Break</span></div><p><b>La Prezzemolina · Via del Colosseo 1 E/F · €1–10.</b> This counter-service pizza shop is directly beside the Colosseum, opens around 11 AM and lists vegan options. Choose pizza al taglio with vegetables, salads or sandwiches.</p><div class="info-grid"><div class="info-box"><h5>Why this works</h5><p>No reservation and almost no detour after Forum/Palatine. Order at the counter and protect the historic-center schedule.</p></div><div class="info-box"><h5>Backup</h5><p><b>Aromaticus Monti</b>, Via Urbana 134, is a €10–20 green bistro with vegetarian dishes; verify Friday lunch hours.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=La+Prezzemolina+Via+del+Colosseo+1+Rome" target="_blank" rel="noopener">📍 Open La Prezzemolina in Maps</a><div class="note tip"><b>Vegetarian phrase:</b> “Siamo vegetariani: niente carne, pesce o brodo di carne, per favore.” Ask whether fresh pasta contains egg if that matters.</div></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="optional" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="810" data-end="855">1:30–2:15 PM</span><h3>📸 Walk + Vittoriano exterior</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag optional">⚪ Optional</span><span class="activity-tag">🚶 ~15 min</span><span class="activity-tag">📸 Photo stop</span></div><p>Walk approximately 15 minutes toward Piazza Venezia, then spend 20–30 minutes on the Vittoriano exterior. Skip the interior/elevator so it cannot threaten the Pantheon time.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-vittoriano.jpg" alt="Vittoriano monument at Piazza Venezia" /></div><h4>📖 A little history</h4><p>The monumental complex honors Victor Emmanuel II, the first king of unified Italy. Built from 1885 into the early 20th century, it also contains Italy's Tomb of the Unknown Soldier.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="855" data-end="870">2:15–2:30 PM</span><h3>🏙️ Piazza Venezia</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">📸 Photo stop</span></div><p>Use 15 minutes to orient yourself at the major junction, photograph the Vittoriano façade and continue west toward the Pantheon.</p><h4>📖 A little history</h4><p>The square takes its name from Palazzo Venezia, a 15th-century papal palace. It became a symbolic center of modern Rome and remains one of the city's busiest crossroads.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk ticket"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="885" data-end="930">2:45–3:30 PM</span><h3>⛪ Pantheon</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 ~15 min</span><span class="activity-tag">🎟️ Timed ticket</span></div><p>Target a 2:45 PM entry and allow 45 minutes. Reserve through the official Italian museum channel when the date opens; verify current price and child-ticket procedure.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-pantheon.jpg" alt="Pantheon portico and dome" /></div><h4>⭐ Look for</h4><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Complete the Pantheon visit</span></li><li><span class="box">✔</span><span>Unreinforced concrete dome</span></li><li><span class="box">✔</span><span>Oculus and moving circle of light</span></li><li><span class="box">✔</span><span>Raphael's tomb</span></li></ul><h4>📖 A little history</h4><p>Hadrian rebuilt the Pantheon around AD 125 on the site of Marcus Agrippa's earlier temple. Its 43.3 m dome remains the world's largest unreinforced concrete dome. Consecration as a church in AD 609 helped preserve it.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="930" data-end="960">3:30–4:00 PM</span><h3>⛲ Piazza Navona</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚶 5–7 min</span><span class="activity-tag">📸 Photo stop</span></div><p>Walk from the Pantheon and spend 30 minutes around the long oval piazza.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-navona.jpg" alt="Piazza Navona and its fountains" /></div><h4>✅ Notice</h4><ul class="checklist"><li><span class="box">✔</span><span>Bernini's Fountain of the Four Rivers</span></li><li><span class="box">✔</span><span>Sant'Agnese in Agone façade</span></li><li><span class="box">✔</span><span>Oval shape of the ancient stadium</span></li></ul><h4>📖 A little history</h4><p>The piazza preserves the footprint of Emperor Domitian's stadium, built around AD 86 for athletic contests. In the 17th century, the Pamphilj family transformed it into one of Baroque Rome's grandest public spaces.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="960" data-end="990">4:00–4:30 PM</span><h3>🍦 Gelato + seated rest</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🍦 Break</span><span class="activity-tag">🧒 Kid-friendly</span></div><p>Keep this break even if the morning runs late. Find gelato near Piazza Navona, sit down, refill water and reassess Nyra's energy before Trevi and the Spanish Steps.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="1005" data-end="1050">4:45–5:30 PM</span><h3>⛲ Trevi Fountain</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 10–15 min</span><span class="activity-tag">📸 Photo stop</span></div><p>Allow 45 minutes for the approach, crowd management and photos. The planned exterior visit normally requires no attraction ticket; follow any local access controls in effect in 2026.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-trevi.jpg" alt="Trevi Fountain in Rome" /></div><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Visit Trevi Fountain</span></li><li><span class="box">✔</span><span>See Oceanus and the sea-horse sculptures</span></li><li><span class="box">✔</span><span>Keep Nyra close in the dense crowd</span></li></ul><h4>📖 A little history</h4><p>Nicola Salvi designed the present fountain in 1732, and Giuseppe Pannini completed it in 1762. It marks the terminal display of the ancient Aqua Virgo aqueduct, which has supplied Rome since 19 BC.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="1060" data-end="1100">5:40–6:20 PM</span><h3>📸 Spanish Steps</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 ~10 min</span><span class="activity-tag">📸 Photo stop</span></div><p>Spend 30–40 minutes at Piazza di Spagna and the base of the steps. This is a public exterior attraction with no normal admission ticket. Follow local rules: sitting on the steps may be prohibited.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-spanish-steps.jpg" alt="Spanish Steps and Piazza di Spagna" /></div><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Visit the Spanish Steps</span></li><li><span class="box">✔</span><span>Barcaccia fountain by Pietro and Gian Lorenzo Bernini</span></li><li><span class="box">✔</span><span>View toward Trinità dei Monti</span></li></ul><h4>📖 A little history</h4><p>Francesco de Sanctis designed the 135-step staircase, completed in 1725, to link the Spanish Embassy's piazza with the French church of Trinità dei Monti.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="1100" data-end="1120">6:20–6:40 PM</span><h3>🚶 Via del Corso</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚶 Walking</span></div><p>Take a short stretch of Rome's long central shopping street as part of the route. Keep moving if Nyra is tired.</p><h4>📖 A little background</h4><p>The straight street follows the ancient Via Lata, part of the route entering Rome from the north. Its modern name recalls the horse races once run here during Carnival.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="optional" data-transport="walk"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="1120" data-end="1140">6:40–7:00 PM</span><h3>🛍️ Via Condotti shopping</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag optional">⚪ Optional</span><span class="activity-tag">🚶 Walking</span></div><p>Browse the luxury storefronts only if the family still has energy. This is the first Day 1 shopping stop to remove.</p></div>
+        </div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk transit taxi"><div class="tl-dot"></div><div class="card">
+          <div class="card-head"><span class="time-pill" data-shift-time data-start="1140" data-end="1260">7:00–9:00 PM</span><h3>🏨 Return + dinner near the hotel</h3><span class="toggle">▾</span></div>
+          <div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚇 Metro</span><span class="activity-tag">🍝 Food</span></div><p><b>Rifugio Romano · Via Volturno 39/41 · €20–30.</b> This old-school trattoria near Termini serves vegan versions of Roman classics alongside its conventional menu. Reserve around 7:45–8:00 PM; try vegan carbonara, cacio e pepe, amatriciana, supplì and tiramisù.</p><div class="info-grid"><div class="info-box"><h5>From Spanish Steps</h5><p>Metro A from Spagna to Repubblica/Termini, then walk. After dinner, Metro B from Termini to Colosseo or taxi.</p></div><div class="info-box"><h5>Closer alternative</h5><p><b>La Nuova Piazzetta</b>, Vicolo del Buon Consiglio 23/a, is nearer the hotel and lists vegetarian dishes.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Rifugio+Romano+Via+Volturno+39+Rome" target="_blank" rel="noopener">📍 Open Rifugio Romano in Maps</a><div class="note star"><b>Nyra fatigue backup:</b> skip Via Condotti first, then take transport. Keep dinner and rest.</div></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="day" id="rome-day2">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>12</span></div><div class="day-title"><h2>🇻🇦 Vatican City + St. Peter's Basilica</h2><p>Saturday · Public transport only where useful</p></div></div>
+      <div class="timeline">
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="transit"><div class="tl-dot"></div><div class="card open"><div class="card-head"><span class="time-pill">7:00–8:45 AM</span><h3>🍳 Breakfast + travel to Vatican</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚇 Transport</span><span class="activity-tag">🍝 Food</span></div><p>Wake at 7:00 AM, eat from 7:30–8:00 AM, and leave around 8:15 AM. Walk to Colosseo Metro B, change at Termini to Metro A, and exit at Ottaviano/Cipro according to the museum entrance route.</p><div class="route"><b>Suggested route:</b> Colosseo → Metro B to Termini → Metro A toward Battistini → Ottaviano or Cipro → walk to Vatican Museums. Allow 30–40 minutes and verify weekend service.</div><div class="note tip"><b>BIT/Tap &amp; Go:</b> each adult validates separately. Keep the same contactless card/device for entry and inspection.</div></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk ticket"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">9:00 AM–12:00 PM</span><h3>🖼️ Vatican Museums + Sistine Chapel</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🎟️ Timed ticket</span><span class="activity-tag">🚶 Inside Vatican</span></div><p>Book a <b>9:00 AM timed entry</b> through the official Vatican Museums channel. Allocate about two hours for the principal galleries and 45–60 minutes for the Sistine Chapel; do not schedule another attraction beforehand.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-vatican-museums.jpg" alt="Vatican Museums galleries" /><img loading="lazy" src="assets/images/rome-sistine.jpg" alt="Sistine Chapel interior details" /></div><h4>⭐ Focus on</h4><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>Vatican Museums</span></li><li data-rome-must><span class="box">✔</span><span>Sistine Chapel</span></li><li><span class="box">✔</span><span>Gallery of Maps</span></li><li><span class="box">✔</span><span>Raphael Rooms if the route/time permits</span></li><li><span class="box">✔</span><span>Follow current photography and silence rules</span></li></ul><div class="info-grid"><div class="info-box"><h5>🎟️ Booking</h5><p>Timed entry is strongly recommended. Verify current 2026 prices and child-ticket rules on the official site.</p></div><div class="info-box"><h5>👧 With Nyra</h5><p>The museums are vast and crowded. Use a compact stroller only where permitted, carry snacks for after exit and focus on colorful ceilings/maps.</p></div></div><h4>📖 A little history</h4><p>The papal collections trace their public origin to Pope Julius II's acquisition of the Laocoön sculpture in 1506. The Sistine Chapel was built for Sixtus IV in the 1470s; Michelangelo painted its ceiling from 1508–1512 and the Last Judgment from 1536–1541.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">12:00–1:30 PM</span><h3>🍔 Flower Burger lunch near Vatican</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🚶 15–20 min</span><span class="activity-tag">🍝 Food</span><span class="activity-tag">🍦 Break</span></div><p><b>Flower Burger · Via dei Gracchi 87 · €10–20.</b> A fully vegan restaurant near the Vatican with colorful plant-based burgers, sides and desserts. It opens around noon, avoiding hidden meat stock or cheese concerns.</p><div class="info-grid"><div class="info-box"><h5>Timing</h5><p>Leave the museum around noon and arrive near opening time. Allow 45–60 minutes, then walk toward St. Peter's security.</p></div><div class="info-box"><h5>With Nyra</h5><p>Casual counter-style service and familiar burger/fries formats make this the easiest Vatican-area family lunch.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Flower+Burger+Via+dei+Gracchi+87+Rome" target="_blank" rel="noopener">📍 Open Flower Burger in Maps</a><div class="note star"><b>Buffer:</b> museum exits and the walk around the Vatican walls take time. Do not compress lunch below a useful family break.</div></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk ticket"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">1:30–3:00 PM</span><h3>⛪ St. Peter's Basilica</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">🎟️ Security queue</span></div><p>Allow 1–1.5 hours plus security waiting. Basilica entry is generally separate from the Vatican Museums; verify current access rules, closures and whether any reservation system applies in 2026.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-st-peters.jpg" alt="St. Peter's Basilica interior and dome" /></div><h4>⭐ Don't miss</h4><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>St. Peter's Basilica</span></li><li><span class="box">✔</span><span>Michelangelo's Pietà</span></li><li><span class="box">✔</span><span>Bernini's bronze baldachin</span></li><li><span class="box">✔</span><span>View upward into Michelangelo's dome</span></li></ul><div class="note warn"><b>Dress and security:</b> shoulders and knees should be covered; carry minimal bags and expect screening. Religious services can restrict areas without notice.</div><h4>📖 A little history</h4><p>The present basilica was built from 1506–1626 over the traditional burial place of St. Peter. Bramante, Raphael, Michelangelo, Maderno and Bernini shaped one of the world's largest churches.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="must" data-transport="walk"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">3:00–3:30 PM</span><h3>⭕ St. Peter's Square</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag must">⭐ Must do</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">📸 Photo stop</span></div><p>Spend 30 minutes in the square after leaving the basilica.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-st-peters-square.jpg" alt="St. Peter's Square and colonnade" /></div><ul class="checklist"><li data-rome-must><span class="box">✔</span><span>St. Peter's Square</span></li><li><span class="box">✔</span><span>Stand at a colonnade focal point</span></li><li><span class="box">✔</span><span>See the central Egyptian obelisk</span></li></ul><h4>📖 A little history</h4><p>Gian Lorenzo Bernini designed the square from 1656–1667. Its four-row colonnades curve like embracing arms around pilgrims approaching the basilica.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="walk"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">3:30–4:15 PM</span><h3>🍦 Gelato + rest</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🍦 Break</span><span class="activity-tag">🧒 Kid-friendly</span></div><p>Sit, have gelato and decide whether Nyra has energy for Castel Sant'Angelo. Preserve this break if museum/security queues ran long.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="optional" data-transport="walk"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">4:15–5:15 PM</span><h3>🏰 Castel Sant'Angelo exterior</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag optional">⚪ Optional</span><span class="activity-tag">🚶 Walking</span><span class="activity-tag">📸 Exterior</span></div><p>Walk toward the Tiber and spend 30–60 minutes around the exterior and Ponte Sant'Angelo. Do not add an interior visit if the Vatican ran late.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-castel-santangelo.jpg" alt="Castel Sant'Angelo beside the Tiber" /></div><h4>📖 A little history</h4><p>Emperor Hadrian built the structure as his mausoleum in the 2nd century AD. It later became a fortress and papal refuge, linked to the Vatican by the fortified Passetto di Borgo.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="optional" data-transport="walk"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">5:15–6:00 PM</span><h3>🌉 Tiber walk</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag optional">⚪ Optional</span><span class="activity-tag">🚶 30–45 min</span></div><p>Take a short riverside or bridge-level walk, then stop before it becomes a tiring detour.</p><div class="gallery"><img loading="lazy" src="assets/images/rome-tiber.jpg" alt="Tiber River through Rome" /></div><div class="note warn"><b>First activity to remove:</b> skip this before removing Castel Sant'Angelo or any Vatican highlight.</div><h4>📖 A little history</h4><p>Rome grew beside the Tiber, which connected the inland city to the Mediterranean. Today's high embankments were built after Italian unification to control the river's destructive floods.</p></div></div></div>
+
+        <div class="tl-item rome-activity" data-priority="recommended" data-transport="transit taxi"><div class="tl-dot"></div><div class="card"><div class="card-head"><span class="time-pill">6:00–8:00 PM</span><h3>🍝 Il Margutta dinner + return</h3><span class="toggle">▾</span></div><div class="card-body"><div class="activity-meta"><span class="activity-tag recommended">🟡 Recommended</span><span class="activity-tag">🍝 Food</span><span class="activity-tag">🚇 Transport</span><span class="activity-tag">🚕 Taxi backup</span></div><p><b>Il Margutta · Via Margutta 118 · €20–40.</b> A long-established vegetarian restaurant/gallery serving creative vegetarian and vegan interpretations of Italian dishes. It is near Piazza del Popolo/Spagna and works naturally with Metro A for the return.</p><div class="info-grid"><div class="info-box"><h5>Getting there</h5><p>From Castel Sant'Angelo/Tiber, walk about 20–25 minutes or take a short taxi. Reserve and reconfirm Saturday dinner hours.</p></div><div class="info-box"><h5>Return</h5><p>Walk to Flaminio or Spagna → Metro A to Termini → Metro B to Colosseo. Use taxi if Nyra is exhausted.</p></div></div><a class="place-link" href="https://www.google.com/maps/search/?api=1&amp;query=Il+Margutta+Via+Margutta+118+Rome" target="_blank" rel="noopener">📍 Open Il Margutta in Maps</a><div class="note star"><b>If the Vatican ran late:</b> preserve Museums → Sistine Chapel → Basilica → Square. Remove Tiber walk first, then Castel Sant'Angelo; keep the reservation realistic.</div></div></div></div>
+      </div>
+    </section>
+
+    <section class="day" id="rome-day3">
+      <div class="day-head"><div class="day-badge"><small>SEP</small><span>13</span></div><div class="day-title"><h2>🧳 Rome Departure</h2><p>Sunday · Based on the final airport or station booking</p></div></div>
+      <div class="timeline"><div class="tl-item rome-activity" data-priority="recommended" data-transport="transit taxi"><div class="tl-dot"></div><div class="card open"><div class="card-head"><span class="time-pill">Per booking</span><h3>🚆 Check out + departure transfer</h3><span class="toggle">▾</span></div><div class="card-body"><p>Set breakfast, checkout and transfer time only after the airport/station and departure booking are confirmed. Do not include this transfer in the €9–18 sightseeing transport estimate.</p><ul class="checklist"><li><span class="box">✔</span><span>Passports and onward tickets</span></li><li><span class="box">✔</span><span>Hotel room and charger check</span></li><li><span class="box">✔</span><span>Confirm airport/station and terminal</span></li><li><span class="box">✔</span><span>Allow family luggage buffer</span></li></ul></div></div></div></div>
+    </section>
+
+    <section class="day" id="rome-overview">
+      <h2 class="section-title">🇮🇹 Rome — 2 Full Days</h2>
+      <div class="info-grid"><div class="info-box"><h5>Sep 11 · Ancient Rome</h5><p>🚶 Primarily walking: Colosseum → Forum/Palatine → Pantheon → Trevi → Spanish Steps.</p></div><div class="info-box"><h5>Sep 12 · Vatican City</h5><p>🇻🇦 Vatican Museums → Sistine Chapel → St. Peter's Basilica → St. Peter's Square.</p></div><div class="info-box"><h5>Travelers</h5><p>2 adults + Nyra (4). Keep breaks and remove optional stops when fatigue rises.</p></div><div class="info-box"><h5>Hotel</h5><p>Via delle Terme di Tito 92, 00184 Rome. Very close to the Colosseum; Day 1 needs no planned public transport.</p></div></div>
+
+      <h2 class="section-title">🗺️ Day 1 Walking Route</h2>
+      <div class="walking-path"><span>Hotel</span><i>→</i><span>Colosseum</span><i>→</i><span>Forum</span><i>→</i><span>Palatine</span><i>→</i><span>Lunch</span><i>→</i><span>Vittoriano</span><i>→</i><span>Piazza Venezia</span><i>→</i><span>Pantheon</span><i>→</i><span>Piazza Navona</span><i>→</i><span>Trevi</span><i>→</i><span>Spanish Steps</span><i>→</i><span>Hotel</span></div>
+      <div class="note tip"><b>Estimate:</b> roughly 8–10 km including movement inside the archaeological sites, with 2–2.5 hours of pure walking. Actual steps will vary by entrances, closures and the return route.</div>
+
+      <h2 class="section-title">🗺️ Day 2 Route</h2>
+      <div class="walking-path"><span>Hotel</span><i>→</i><span>🚇 Metro</span><i>→</i><span>Vatican Museums</span><i>→</i><span>Sistine Chapel</span><i>→</i><span>Lunch</span><i>→</i><span>Basilica</span><i>→</i><span>Square</span><i>→</i><span>Castel Sant'Angelo</span><i>→</i><span>Tiber</span><i>→</i><span>Dinner</span><i>→</i><span>🚇 Hotel</span></div>
+
+      <h2 class="section-title">🎟️ Rome Ticket Planning</h2>
+      <div class="info-grid"><div class="info-box"><h5>Colosseum · 9:00 AM</h5><p>Timed entry recommended. Select a ticket covering Colosseum, Roman Forum and Palatine Hill. Verify current price and child reservation.</p></div><div class="info-box"><h5>Pantheon · 2:45 PM</h5><p>Timed ticket recommended. Use the official Italian museum channel and verify 2026 price/rules.</p></div><div class="info-box"><h5>Vatican · 9:00 AM</h5><p>Timed Vatican Museums entry strongly recommended. Allocate approximately three hours including the Sistine Chapel.</p></div><div class="info-box"><h5>St. Peter's Basilica</h5><p>Allow 1–1.5 hours plus security. Keep shoulders/knees covered and maintain a buffer after the museums.</p></div><div class="info-box"><h5>Free exterior stops</h5><p>Trevi Fountain and Spanish Steps need no normal admission for the planned exterior visits. Follow any 2026 crowd controls.</p></div><div class="info-box"><h5>Vittoriano</h5><p>Exterior/photo stop is enough. Interior/elevator is optional and must not interfere with the Pantheon.</p></div></div>
+
+      <h2 class="section-title">🚇 Rome Transportation</h2>
+      <div class="info-grid"><div class="info-box"><h5>BIT ticket</h5><p><b>€1.50 per adult</b>, valid 100 minutes from validation on buses/trams and permitted transfers. On Metro it covers one journey, including line changes without exiting the barriers under ATAC rules.</p></div><div class="info-box"><h5>Tap &amp; Go</h5><p>Each adult uses a separate contactless card/device and taps at the validator/gate. Validate paper tickets at the start and again where ATAC requires.</p></div><div class="info-box"><h5>Nyra</h5><p>At age 4, show her as free when accompanied by a paying adult, subject to current ATAC child-travel rules. Carry proof of age and recheck before travel.</p></div><div class="info-box"><h5>Recommended strategy</h5><p>Walk Sep 11; use BIT/Tap &amp; Go Sep 12; buy the departure transfer separately. A 48/72-hour pass is not recommended.</p></div></div>
+      <div class="note star"><b>Estimated sightseeing transport:</b> approximately €9–18 total for two adults, depending on actual rides. Airport/station departure is excluded.</div>
+
+      <h2 class="section-title">🍝 Vegetarian Restaurants to Plan</h2>
+      <div class="info-grid">
+        <div class="info-box"><h5>Day 1 lunch · La Prezzemolina</h5><p>Via del Colosseo 1 E/F · €1–10 · counter-service pizza with vegan options. Best fit for the tight Colosseum/Monti lunch window.</p></div>
+        <div class="info-box"><h5>Day 1 dinner · Rifugio Romano</h5><p>Via Volturno 39/41 · €20–30 · reserve ahead for vegan Roman classics near Termini.</p></div>
+        <div class="info-box"><h5>Day 2 lunch · Flower Burger</h5><p>Via dei Gracchi 87 · €10–20 · fully vegan burgers and sides near Vatican; casual and child-friendly.</p></div>
+        <div class="info-box"><h5>Day 2 dinner · Il Margutta</h5><p>Via Margutta 118 · €20–40 · destination vegetarian restaurant/gallery near Spagna; reserve and recheck Saturday hours.</p></div>
+      </div>
+
+      <h2 class="section-title">🧒 Nyra Fatigue Backup</h2>
+      <div class="info-grid"><div class="info-box"><h5>Remove in this order</h5><p>1. Tiber walk · 2. Via Condotti · 3. Castel Sant'Angelo · 4. Vittoriano interior · 5. Extended Piazza Venezia time.</p></div><div class="info-box"><h5>Keep</h5><p>Colosseum, Vatican Museums/Sistine Chapel, St. Peter's Basilica, Pantheon, Trevi Fountain, Spanish Steps and all planned breaks.</p></div><div class="info-box"><h5>Walking support</h5><p>Use a compact stroller where surfaces permit and a carrier for Forum/Palatine terrain. Schedule water, shade and toilets proactively.</p></div><div class="info-box"><h5>September comfort</h5><p>Bring hats, sunscreen and refillable bottles. Rome can remain hot, and many ancient sites have limited shade.</p></div></div>
+
+      <h2 class="section-title">✅ Rome Attractions Checklist</h2>
+      <div class="info-grid"><div class="info-box"><h5>⭐ Must do</h5><p>Colosseum · Roman Forum · Palatine Hill · Vatican Museums · Sistine Chapel · St. Peter's Basilica · St. Peter's Square · Pantheon · Trevi Fountain · Spanish Steps.</p></div><div class="info-box"><h5>🟡 Recommended</h5><p>Piazza Navona · Piazza Venezia · gelato stop · Via del Corso.</p></div><div class="info-box"><h5>⚪ Optional</h5><p>Vittoriano · Castel Sant'Angelo · Tiber walk · Via Condotti shopping.</p></div><div class="info-box"><h5>⚠️ Verify before travel</h5><p>Official ticket release dates, prices, child reservations, opening hours, religious closures and public-transport service.</p></div></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Made for your Europe 2026 trip · 🇫🇷 Paris ready · 🇨🇭 Switzerland ready · 🇮🇹 Rome ready.
+</footer>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <img id="lightboxImg" src="" alt="" />
+  <div class="caption" id="lightboxCaption"></div>
+</div>
+
+<script>
+  // Collapsible cards
+  document.querySelectorAll('.card-head').forEach(head=>{
+    head.addEventListener('click',()=>head.parentElement.classList.toggle('open'));
+  });
+
+  // Checklist toggle + progress
+  const items = document.querySelectorAll('[data-view="france"] .checklist li');
+  const fill = document.getElementById('progressFill');
+  const label = document.getElementById('progressLabel');
+  function updateProgress(){
+    const done = document.querySelectorAll('[data-view="france"] .checklist li.done').length;
+    const pct = items.length ? Math.round(done/items.length*100) : 0;
+    fill.style.width = pct+'%';
+    label.textContent = `${done} of ${items.length} tasks done — ${pct}% complete`;
+  }
+  items.forEach(li=>{
+    li.addEventListener('click',()=>{ li.classList.toggle('done'); updateProgress(); });
+  });
+  updateProgress();
+
+  // Switzerland checklist progress
+  const swissItems = document.querySelectorAll('[data-view="switzerland"] .checklist li');
+  const swissFill = document.getElementById('swissProgressFill');
+  const swissLabel = document.getElementById('swissProgressLabel');
+  function updateSwissProgress(){
+    const done = document.querySelectorAll('[data-view="switzerland"] .checklist li.done').length;
+    const pct = swissItems.length ? Math.round(done/swissItems.length*100) : 0;
+    swissFill.style.width = pct+'%';
+    swissLabel.textContent = `${done} of ${swissItems.length} experiences done — ${pct}% complete`;
+  }
+  swissItems.forEach(item=>{
+    item.addEventListener('click',()=>{ item.classList.toggle('done'); updateSwissProgress(); });
+  });
+  updateSwissProgress();
+
+  // Rome checklist and must-do progress
+  const romeItems = document.querySelectorAll('[data-view="italy"] .checklist li');
+  const romeMustItems = document.querySelectorAll('[data-view="italy"] [data-rome-must]');
+  const romeFill = document.getElementById('romeProgressFill');
+  const romeLabel = document.getElementById('romeProgressLabel');
+  function updateRomeProgress(){
+    const done = document.querySelectorAll('[data-view="italy"] [data-rome-must].done').length;
+    const pct = romeMustItems.length ? Math.round(done/romeMustItems.length*100) : 0;
+    romeFill.style.width = pct+'%';
+    romeLabel.textContent = `Rome progress: ${done} / ${romeMustItems.length} must-do attractions completed`;
+  }
+  romeItems.forEach(item=>{
+    item.addEventListener('click',()=>{ item.classList.toggle('done'); updateRomeProgress(); });
+  });
+  updateRomeProgress();
+
+  // Rome filters
+  const romeView = document.querySelector('[data-view="italy"]');
+  const romeFilters = {priority:'all',transport:'all'};
+  function applyRomeFilters(){
+    document.querySelectorAll('[data-view="italy"] .rome-activity').forEach(activity=>{
+      const priorityMatch = romeFilters.priority==='all' || activity.dataset.priority===romeFilters.priority;
+      const modes = (activity.dataset.transport || '').split(' ');
+      const transportMatch = romeFilters.transport==='all' || modes.includes(romeFilters.transport);
+      activity.classList.toggle('filtered-out', !(priorityMatch && transportMatch));
+    });
+  }
+  document.querySelectorAll('[data-rome-filter]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const type = button.dataset.romeFilter;
+      romeFilters[type] = button.dataset.value;
+      document.querySelectorAll(`[data-rome-filter="${type}"]`).forEach(item=>item.classList.toggle('active',item===button));
+      applyRomeFilters();
+    });
+  });
+
+  // Nyra-friendly mode
+  const fatigueButton = document.getElementById('romeFatigueBtn');
+  fatigueButton.addEventListener('click',()=>{
+    const enabled = romeView.classList.toggle('fatigue-mode');
+    fatigueButton.classList.toggle('active',enabled);
+    fatigueButton.textContent = enabled ? '🧒 Nyra Friendly Mode: On' : '🧒 Nyra Friendly Mode';
+  });
+
+  // Shift the complete Day 1 plan when the Colosseum start changes
+  let romeTimeOffset = 0;
+  function formatRomeTime(totalMinutes){
+    const minutes = ((totalMinutes%1440)+1440)%1440;
+    const hour24 = Math.floor(minutes/60);
+    const minute = minutes%60;
+    const suffix = hour24>=12 ? 'PM' : 'AM';
+    const hour = hour24%12 || 12;
+    return `${hour}:${String(minute).padStart(2,'0')} ${suffix}`;
+  }
+  function updateRomeTimes(){
+    document.querySelectorAll('[data-shift-time]').forEach(pill=>{
+      const start = Number(pill.dataset.start)+romeTimeOffset;
+      const end = Number(pill.dataset.end)+romeTimeOffset;
+      pill.textContent = `${formatRomeTime(start)}–${formatRomeTime(end)}`;
+    });
+    document.getElementById('romeTimeShift').textContent = formatRomeTime(540+romeTimeOffset);
+  }
+  document.getElementById('romeTimeEarlier').addEventListener('click',()=>{
+    if(romeTimeOffset>-60){romeTimeOffset-=15;updateRomeTimes();}
+  });
+  document.getElementById('romeTimeLater').addEventListener('click',()=>{
+    if(romeTimeOffset<60){romeTimeOffset+=15;updateRomeTimes();}
+  });
+
+  // Expand Rome galleries with additional verified local views
+  const romeGalleryImages = {
+    'Colosseum': [['assets/images/rome-colosseum-2.jpg','Colosseum exterior panorama']],
+    'Roman Forum + Palatine Hill': [
+      ['assets/images/rome-forum-2.jpg','Brick ruins in the Roman Forum'],
+      ['assets/images/rome-palatine-2.jpg','Umbrella pine among Palatine Hill ruins']
+    ],
+    'Walk + Vittoriano exterior': [['assets/images/rome-vittoriano-2.jpg','Vittoriano in evening light']],
+    'Piazza Venezia': [['assets/images/rome-piazza-venezia.jpg','Piazza Venezia seen from the Vittoriano']],
+    'Pantheon': [['assets/images/rome-pantheon-2.jpg','Pantheon dome and oculus']],
+    'Piazza Navona': [['assets/images/rome-navona-2.jpg','Fountain of the Four Rivers and obelisk in Piazza Navona']],
+    'Trevi Fountain': [['assets/images/rome-trevi-2.jpg','Trevi Fountain illuminated at night']],
+    'Spanish Steps': [['assets/images/rome-spanish-steps-2.jpg','Spanish Steps below Trinità dei Monti']],
+    'Via del Corso': [['assets/images/rome-piazza-venezia.jpg','Via del Corso extending north from Piazza Venezia']],
+    'Via Condotti shopping': [['assets/images/rome-via-condotti.jpg','Via dei Condotti from the Spanish Steps']],
+    'Vatican Museums + Sistine Chapel': [
+      ['assets/images/rome-vatican-museums-2.jpg','A gallery inside the Vatican Museums'],
+      ['assets/images/rome-sistine-2.jpg','Michelangelo frescoes in the Sistine Chapel']
+    ],
+    "St. Peter's Basilica": [['assets/images/rome-st-peters-2.jpg',"St. Peter's Basilica façade"]],
+    "St. Peter's Square": [['assets/images/rome-st-peters-square-2.jpg',"Fountain and colonnade in St. Peter's Square"]],
+    "Castel Sant'Angelo exterior": [['assets/images/rome-castel-santangelo-2.jpg',"Castel Sant'Angelo and Ponte Sant'Angelo at night"]],
+    'Tiber walk': [['assets/images/rome-tiber-2.jpg','Tiber and St. Peter’s Basilica at dusk']]
+  };
+  document.querySelectorAll('[data-view="italy"] .rome-activity').forEach(activity=>{
+    const heading = activity.querySelector('.card-head h3')?.textContent.trim().replace(/^[^\p{L}\p{N}]+/u,'');
+    const images = romeGalleryImages[heading];
+    if(!images) return;
+    const body = activity.querySelector('.card-body');
+    let gallery = body.querySelector('.gallery');
+    if(!gallery){
+      gallery = document.createElement('div');
+      gallery.className = 'gallery';
+      const firstParagraph = body.querySelector('p');
+      firstParagraph?.insertAdjacentElement('afterend',gallery);
+    }
+    images.forEach(([src,alt])=>{
+      if(gallery.querySelector(`img[src="${src}"]`)) return;
+      const image = document.createElement('img');
+      image.loading = 'lazy';
+      image.src = src;
+      image.alt = alt;
+      gallery.appendChild(image);
+    });
+  });
+
+  // Complete individual Rome activity cards
+  document.querySelectorAll('[data-view="italy"] .rome-activity .card-body').forEach(body=>{
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'activity-complete';
+    button.textContent = '□ Mark activity complete';
+    button.addEventListener('click',event=>{
+      event.stopPropagation();
+      const activity = body.closest('.rome-activity');
+      const done = activity.classList.toggle('activity-done');
+      button.classList.toggle('done',done);
+      button.textContent = done ? '✓ Activity completed' : '□ Mark activity complete';
+    });
+    body.appendChild(button);
+  });
+
+  // Lightbox
+  const lb = document.getElementById('lightbox');
+  const lbImg = document.getElementById('lightboxImg');
+  const lbCap = document.getElementById('lightboxCaption');
+  document.querySelectorAll('.gallery img').forEach(img=>{
+    img.addEventListener('error',()=>{
+      img.classList.add('image-error');
+      img.alt = `${img.alt || 'Image'} unavailable`;
+    },{once:true});
+  });
+  document.querySelectorAll('.gallery img, .hero-card img').forEach(img=>{
+    img.addEventListener('click',e=>{
+      e.stopPropagation();
+      lbImg.src = img.src.replace(/width=\d+/, 'width=1600');
+      lbCap.textContent = img.alt || '';
+      lb.classList.add('show');
+    });
+  });
+  lb.addEventListener('click',()=>lb.classList.remove('show'));
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape') lb.classList.remove('show'); });
+
+  // Destination tabs
+  const destinationTabs = document.querySelectorAll('.dest-tab[data-destination]');
+  const destinationViews = document.querySelectorAll('.destination-view');
+  destinationTabs.forEach(tab=>{
+    tab.addEventListener('click',()=>{
+      const destination = tab.dataset.destination;
+      destinationTabs.forEach(item=>item.classList.toggle('active', item===tab));
+      destinationViews.forEach(view=>view.classList.toggle('active', view.dataset.view===destination));
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+
+  // Active day-nav highlight on scroll
+  const links = document.querySelectorAll('.daylink');
+  const sections = [...links].map(l=>document.querySelector(l.getAttribute('href')));
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(en=>{
+      if(en.isIntersecting){
+        const id = '#'+en.target.id;
+        links.forEach(l=>l.classList.toggle('active', l.getAttribute('href')===id));
+      }
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  sections.forEach(s=>s && obs.observe(s));
+
+  // Soon tabs
+  document.querySelectorAll('.dest-tab.soon').forEach(t=>{
+    t.addEventListener('click',()=>alert('The Italy itinerary will be added here next. 🇮🇹'));
+  });
+</script>
+</body>
+</html>
