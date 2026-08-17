@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="A personal travel itinerary hub for thoughtfully planned journeys." />
+<title>Travel Itinerary — Journey Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700&amp;display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+<style>
+  :root{
+    --ink:#f5f3ed;
+    --muted:#aaa99f;
+    --bg:#111311;
+    --surface:#181b18;
+    --surface-2:#20241f;
+    --line:#343a32;
+    --moss:#a8c686;
+    --moss-dark:#26351f;
+    --sky:#9fc8db;
+    --coral:#e89172;
+    --gold:#e1bd69;
+    --danger:#e88b82;
+    --shadow:0 18px 50px rgba(0,0,0,.3);
+    --radius:8px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    min-height:100vh;
+    color:var(--ink);
+    background:
+      linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px),
+      var(--bg);
+    background-size:36px 36px;
+    font-family:"DM Sans",sans-serif;
+    line-height:1.55;
+  }
+  button,input,select{font:inherit}
+  button,a{tap-highlight-color:transparent}
+  a{color:inherit;text-decoration:none}
+  :focus-visible{outline:2px solid var(--moss);outline-offset:3px}
+  .shell{max-width:1240px;margin:0 auto;padding:0 24px}
+  .topbar{
+    position:sticky;top:0;z-index:30;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(17,19,17,.88);
+    backdrop-filter:blur(16px);
+  }
+  .topbar-inner{height:68px;display:flex;align-items:center;gap:24px}
+  .brand{display:flex;align-items:center;gap:11px;font-weight:700}
+  .brand-mark{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:var(--moss);color:#12200d}
+  .brand span:last-child{font-family:"Fraunces",serif;font-size:1.08rem}
+  .nav{display:flex;gap:6px;margin-left:24px}
+  .nav a{padding:8px 10px;color:var(--muted);font-size:.88rem;font-weight:600}
+  .nav a.active,.nav a:hover{color:var(--ink)}
+  .top-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .icon-button,.command-button{
+    border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;
+    min-height:38px;border-radius:var(--radius);display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .icon-button{width:38px;padding:0}
+  .command-button{padding:0 14px;font-weight:700;font-size:.84rem}
+  .command-button.primary{background:var(--moss);color:#14200f;border-color:var(--moss)}
+  .command-button:hover,.icon-button:hover{border-color:#667060}
+  .hero{padding:64px 0 44px;border-bottom:1px solid var(--line)}
+  .eyebrow{display:flex;align-items:center;gap:8px;color:var(--moss);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em}
+  .eyebrow::before{content:"";width:28px;height:1px;background:currentColor}
+  .hero-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:60px;align-items:end;margin-top:24px}
+  h1{font-family:"Fraunces",serif;font-size:clamp(2.6rem,6vw,5.7rem);line-height:.96;letter-spacing:0;margin:0;max-width:850px}
+  .hero-copy{font-size:1rem;color:var(--muted);max-width:480px;margin:22px 0 0}
+  .overview{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  .stat{padding:20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .stat strong{display:block;font-family:"Fraunces",serif;font-size:1.7rem;line-height:1;color:var(--ink)}
+  .stat span{display:block;color:var(--muted);font-size:.75rem;margin-top:7px;text-transform:uppercase;letter-spacing:.08em}
+  main{padding:44px 0 80px}
+  .workspace-head{display:flex;align-items:end;gap:20px;margin-bottom:22px}
+  .workspace-head h2{font-family:"Fraunces",serif;font-size:2rem;margin:0;letter-spacing:0}
+  .workspace-head p{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+  .tools{margin-left:auto;display:flex;gap:9px;align-items:center}
+  .search{position:relative}
+  .search i{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;color:var(--muted);pointer-events:none}
+  .search input{
+    width:230px;height:40px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);
+    color:var(--ink);padding:0 12px 0 36px;
+  }
+  .filter-tabs{display:flex;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius)}
+  .filter-tabs button{border:0;border-radius:5px;background:transparent;color:var(--muted);padding:6px 10px;font-size:.76rem;font-weight:700;cursor:pointer}
+  .filter-tabs button.active{background:var(--surface-2);color:var(--ink)}
+  .trips{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(290px,.75fr);gap:20px;align-items:start}
+  .trip-card{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .trip-media{height:330px;position:relative;overflow:hidden;background:#20231f}
+  .trip-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
+  .trip-card:hover .trip-media img{transform:scale(1.025)}
+  .trip-media::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(13,15,13,.92),transparent 60%)}
+  .status{position:absolute;z-index:2;top:16px;left:16px;padding:6px 9px;border-radius:6px;background:rgba(17,19,17,.84);border:1px solid rgba(255,255,255,.16);font-size:.71rem;font-weight:700;backdrop-filter:blur(8px)}
+  .status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--moss);display:inline-block;margin-right:7px}
+  .trip-title-overlay{position:absolute;z-index:2;left:24px;right:24px;bottom:22px;display:flex;align-items:end;gap:20px}
+  .trip-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:700}
+  .trip-title-overlay h3{font-family:"Fraunces",serif;font-size:2.5rem;line-height:1;margin:5px 0 0;letter-spacing:0}
+  .trip-dates{margin-left:auto;text-align:right;font-size:.83rem;color:#e6e5de;white-space:nowrap}
+  .trip-body{padding:22px 24px 24px}
+  .route-line{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:#d9dbd3;font-size:.86rem;font-weight:600}
+  .route-line i{width:15px;color:var(--moss)}
+  .route-line .arrow{color:#656b62}
+  .trip-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:20px 0}
+  .meta-cell{background:var(--surface-2);padding:13px 14px}
+  .meta-cell b{display:block;font-size:.82rem}
+  .meta-cell span{color:var(--muted);font-size:.69rem;text-transform:uppercase;letter-spacing:.06em}
+  .trip-actions{display:flex;align-items:center;gap:9px}
+  .trip-actions .command-button{min-height:42px}
+  .trip-actions .icon-button{margin-left:auto}
+  .side-stack{display:grid;gap:20px}
+  .panel{border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:20px}
+  .panel-head{display:flex;align-items:center;gap:10px;margin-bottom:17px}
+  .panel-head i{width:18px;color:var(--moss)}
+  .panel h3{font-size:.95rem;margin:0}
+  .panel-sub{color:var(--muted);font-size:.75rem;margin-left:auto}
+  .progress-track{height:7px;background:#2b302a;border-radius:99px;overflow:hidden}
+  .progress-track span{display:block;width:92%;height:100%;background:linear-gradient(90deg,var(--moss),var(--sky))}
+  .progress-copy{display:flex;justify-content:space-between;color:var(--muted);font-size:.74rem;margin-top:8px}
+  .readiness-list{list-style:none;margin:17px 0 0;padding:0;display:grid;gap:11px}
+  .readiness-list li{display:flex;align-items:center;gap:10px;font-size:.8rem;color:#d6d8d1}
+  .readiness-list i{width:16px;color:var(--moss)}
+  .readiness-list li.pending i{color:var(--gold)}
+  .future-panel{text-align:center;padding:26px 20px}
+  .future-icon{width:48px;height:48px;border:1px dashed #596255;display:grid;place-items:center;margin:0 auto 13px;color:var(--moss);border-radius:50%}
+  .future-panel h3{font-family:"Fraunces",serif;font-size:1.2rem;margin:0}
+  .future-panel p{color:var(--muted);font-size:.79rem;margin:7px auto 16px;max-width:240px}
+  .custom-trips{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+  .custom-trip{border:1px solid var(--line);background:var(--surface);padding:18px;border-radius:var(--radius);min-height:170px;display:flex;flex-direction:column}
+  .custom-trip .status{position:static;align-self:flex-start;margin-bottom:17px}
+  .custom-trip h3{font-family:"Fraunces",serif;margin:0;font-size:1.3rem}
+  .custom-trip p{font-size:.78rem;color:var(--muted);margin:6px 0 18px}
+  .custom-trip a{margin-top:auto;color:var(--moss);font-size:.78rem;font-weight:700}
+  .empty-search{display:none;border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted);border-radius:var(--radius)}
+  dialog{width:min(520px,calc(100% - 32px));padding:0;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:var(--radius);box-shadow:0 30px 100px rgba(0,0,0,.65)}
+  dialog::backdrop{background:rgba(5,7,5,.78);backdrop-filter:blur(5px)}
+  .dialog-head{display:flex;align-items:center;padding:19px 20px;border-bottom:1px solid var(--line)}
+  .dialog-head h2{font-family:"Fraunces",serif;margin:0;font-size:1.45rem}
+  .dialog-head button{margin-left:auto}
+  form{padding:20px;display:grid;gap:15px}
+  .field{display:grid;gap:6px}
+  .field label{font-size:.74rem;color:var(--muted);font-weight:700}
+  .field input,.field select{width:100%;height:42px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--ink);padding:0 11px}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+  footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-size:.75rem}
+  .footer-inner{display:flex;align-items:center;gap:20px}
+  .footer-inner span:last-child{margin-left:auto}
+  @media(max-width:900px){
+    .hero-grid,.trips{grid-template-columns:1fr}
+    .overview{max-width:540px}
+    .side-stack{grid-template-columns:1fr 1fr}
+    .custom-trips{grid-template-columns:repeat(2,1fr)}
+  }
+  @media(max-width:640px){
+    .shell{padding:0 16px}
+    .topbar-inner{height:62px}
+    .nav{display:none}
+    .top-actions .command-button span{display:none}
+    .hero{padding:42px 0 34px}
+    .hero-grid{gap:34px}
+    h1{font-size:3rem}
+    .workspace-head{display:block}
+    .tools{margin:18px 0 0;display:grid}
+    .search input{width:100%}
+    .filter-tabs{overflow-x:auto}
+    .trip-media{height:270px}
+    .trip-title-overlay{display:block}
+    .trip-title-overlay h3{font-size:2rem}
+    .trip-dates{margin:8px 0 0;text-align:left}
+    .trip-meta{grid-template-columns:repeat(2,1fr)}
+    .trip-actions{flex-wrap:wrap}
+    .trip-actions .command-button.primary{width:100%}
+    .side-stack,.custom-trips{grid-template-columns:1fr}
+    .field-row{grid-template-columns:1fr}
+    .footer-inner{display:block}
+    .footer-inner span{display:block;margin:5px 0!important}
+  }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="shell topbar-inner">
+    <a class="brand" href="#top" aria-label="Travel Itinerary home">
+      <span class="brand-mark"><i data-lucide="compass"></i></span>
+      <span>Travel Itinerary</span>
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="active" href="#trips">Trips</a>
+      <a href="#readiness">Readiness</a>
+    </nav>
+    <div class="top-actions">
+      <a class="icon-button" href="https://github.com/GauravKandurwar/TravelIternary" target="_blank" rel="noopener" title="Open GitHub repository" aria-label="Open GitHub repository"><i data-lucide="github"></i></a>
+      <button class="command-button primary" id="openAddTrip" type="button"><i data-lucide="plus"></i><span>Add trip</span></button>
+    </div>
+  </div>
+</header>
+
+<div id="top" class="hero">
+  <div class="shell">
+    <div class="eyebrow">Personal journey library</div>
+    <div class="hero-grid">
+      <div>
+        <h1>Every journey,<br />beautifully organized.</h1>
+        <p class="hero-copy">One calm place for routes, reservations, daily plans, food, transport and the small details that make a trip feel effortless.</p>
+      </div>
+      <div class="overview" aria-label="Travel library summary">
+        <div class="stat"><strong id="tripCount">1</strong><span>Trips</span></div>
+        <div class="stat"><strong>3</strong><span>Countries</span></div>
+        <div class="stat"><strong>13</strong><span>Days planned</span></div>
+        <div class="stat"><strong>2026</strong><span>Next journey</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main id="trips" class="shell">
+  <div class="workspace-head">
+    <div>
+      <h2>Your trips</h2>
+      <p>Open an itinerary or add a future journey to your library.</p>
+    </div>
+    <div class="tools">
+      <div class="search">
+        <i data-lucide="search"></i>
+        <input id="tripSearch" type="search" placeholder="Search trips or places" aria-label="Search trips" />
+      </div>
+      <div class="filter-tabs" aria-label="Filter trips">
+        <button class="active" type="button" data-status="all">All</button>
+        <button type="button" data-status="upcoming">Upcoming</button>
+        <button type="button" data-status="past">Past</button>
+        <button type="button" data-status="draft">Drafts</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="trips">
+    <article class="trip-card" data-trip data-name="Europe 2026 Paris Interlaken Rome France Switzerland Italy" data-status="upcoming">
+      <div class="trip-media">
+        <img src="Europe%202026/assets/images/hero-eiffel.jpg" alt="Eiffel Tower representing the Europe 2026 journey" />
+        <span class="status">Planning complete</span>
+        <div class="trip-title-overlay">
+          <div>
+            <div class="trip-kicker">Featured journey</div>
+            <h3>Europe 2026</h3>
+          </div>
+          <div class="trip-dates">Sep 1–13, 2026<br />13 days</div>
+        </div>
+      </div>
+      <div class="trip-body">
+        <div class="route-line" aria-label="Europe 2026 route">
+          <i data-lucide="map-pin"></i><span>Paris</span><span class="arrow">→</span><span>Interlaken</span><span class="arrow">→</span><span>Rome</span>
+        </div>
+        <div class="trip-meta">
+          <div class="meta-cell"><span>Travelers</span><b>2 adults + child</b></div>
+          <div class="meta-cell"><span>Destinations</span><b>3 cities</b></div>
+          <div class="meta-cell"><span>Style</span><b>Culture + Alps</b></div>
+          <div class="meta-cell"><span>Planning</span><b>Day by day</b></div>
+        </div>
+        <div class="trip-actions">
+          <a class="command-button primary" href="Europe%202026/index.html"><i data-lucide="calendar-days"></i>Open itinerary</a>
+          <a class="command-button" href="Europe%202026/index.html#overview"><i data-lucide="route"></i>View summary</a>
+          <button class="icon-button" type="button" id="copyTripLink" title="Copy itinerary link" aria-label="Copy itinerary link"><i data-lucide="link"></i></button>
+        </div>
+      </div>
+    </article>
+
+    <aside class="side-stack" id="readiness">
+      <section class="panel">
+        <div class="panel-head"><i data-lucide="clipboard-check"></i><h3>Trip readiness</h3><span class="panel-sub">Europe 2026</span></div>
+        <div class="progress-track" aria-label="Trip readiness 92 percent"><span></span></div>
+        <div class="progress-copy"><span>Planning status</span><b>92%</b></div>
+        <ul class="readiness-list">
+          <li><i data-lucide="check-circle-2"></i>Day-by-day itinerary complete</li>
+          <li><i data-lucide="check-circle-2"></i>Routes and local transport added</li>
+          <li><i data-lucide="check-circle-2"></i>Vegetarian dining researched</li>
+          <li class="pending"><i data-lucide="clock-3"></i>Verify final 2026 timetables</li>
+          <li class="pending"><i data-lucide="clock-3"></i>Confirm attraction tickets</li>
+        </ul>
+      </section>
+
+      <section class="panel future-panel">
+        <div class="future-icon"><i data-lucide="plane-takeoff"></i></div>
+        <h3>Where to next?</h3>
+        <p>Add your next trip now and keep every journey in the same organized library.</p>
+        <button class="command-button" id="openAddTripSecondary" type="button"><i data-lucide="plus"></i>Add future trip</button>
+      </section>
+    </aside>
+  </div>
+
+  <div id="customTrips" class="custom-trips" aria-live="polite"></div>
+  <div id="emptySearch" class="empty-search">No trips match this search and filter.</div>
+</main>
+
+<footer>
+  <div class="shell footer-inner">
+    <span>Travel Itinerary · Personal journey library</span>
+    <span>Plans live here. Memories travel with you.</span>
+  </div>
+</footer>
+
+<dialog id="tripDialog" aria-labelledby="dialogTitle">
+  <div class="dialog-head">
+    <h2 id="dialogTitle">Add a future trip</h2>
+    <button class="icon-button" id="closeDialog" type="button" aria-label="Close dialog"><i data-lucide="x"></i></button>
+  </div>
+  <form id="tripForm">
+    <div class="field">
+      <label for="tripName">Trip name</label>
+      <input id="tripName" name="name" required placeholder="Japan 2027" maxlength="60" />
+    </div>
+    <div class="field">
+      <label for="tripPlaces">Destinations</label>
+      <input id="tripPlaces" name="places" required placeholder="Tokyo · Kyoto · Osaka" maxlength="120" />
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label for="tripDates">Dates</label>
+        <input id="tripDates" name="dates" required placeholder="Apr 4–16, 2027" maxlength="40" />
+      </div>
+      <div class="field">
+        <label for="tripStatus">Status</label>
+        <select id="tripStatus" name="status">
+          <option value="draft">Draft</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="past">Past</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="tripLink">Itinerary link (optional)</label>
+      <input id="tripLink" name="link" type="url" placeholder="https://…" />
+    </div>
+    <div class="form-actions">
+      <button class="command-button" id="cancelDialog" type="button">Cancel</button>
+      <button class="command-button primary" type="submit"><i data-lucide="save"></i>Save trip</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+  const STORAGE_KEY = 'travel-itinerary-trips-v1';
+  const dialog = document.getElementById('tripDialog');
+  const form = document.getElementById('tripForm');
+  const customTrips = document.getElementById('customTrips');
+  const search = document.getElementById('tripSearch');
+  const emptySearch = document.getElementById('emptySearch');
+  let activeStatus = 'all';
+
+  function refreshIcons(){
+    if(window.lucide) window.lucide.createIcons({attrs:{'stroke-width':1.8}});
+  }
+
+  function openDialog(){
+    dialog.showModal();
+    requestAnimationFrame(()=>document.getElementById('tripName').focus());
+  }
+
+  function closeDialog(){
+    dialog.close();
+    form.reset();
+  }
+
+  function getTrips(){
+    try{return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []}
+    catch{return []}
+  }
+
+  function saveTrips(trips){
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(trips));
+  }
+
+  function escapeHtml(value){
+    return value.replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
+  }
+
+  function renderTrips(){
+    const trips = getTrips();
+    customTrips.innerHTML = trips.map((trip,index)=>`
+      <article class="custom-trip" data-trip data-name="${escapeHtml(`${trip.name} ${trip.places}`)}" data-status="${escapeHtml(trip.status)}">
+        <span class="status">${escapeHtml(trip.status)}</span>
+        <h3>${escapeHtml(trip.name)}</h3>
+        <p>${escapeHtml(trip.places)}<br />${escapeHtml(trip.dates)}</p>
+        ${trip.link ? `<a href="${escapeHtml(trip.link)}" target="_blank" rel="noopener">Open itinerary →</a>` : `<a href="#" data-remove-trip="${index}">Remove draft →</a>`}
+      </article>
+    `).join('');
+    document.getElementById('tripCount').textContent = String(1 + trips.length);
+    customTrips.querySelectorAll('[data-remove-trip]').forEach(link=>{
+      link.addEventListener('click',event=>{
+        event.preventDefault();
+        const next = getTrips();
+        next.splice(Number(link.dataset.removeTrip),1);
+        saveTrips(next);
+        renderTrips();
+        applyFilters();
+      });
+    });
+    applyFilters();
+  }
+
+  function applyFilters(){
+    const query = search.value.trim().toLowerCase();
+    let visible = 0;
+    document.querySelectorAll('[data-trip]').forEach(card=>{
+      const matchesSearch = (card.dataset.name || '').toLowerCase().includes(query);
+      const matchesStatus = activeStatus==='all' || card.dataset.status===activeStatus;
+      const show = matchesSearch && matchesStatus;
+      card.hidden = !show;
+      if(show) visible++;
+    });
+    emptySearch.style.display = visible ? 'none' : 'block';
+  }
+
+  document.getElementById('openAddTrip').addEventListener('click',openDialog);
+  document.getElementById('openAddTripSecondary').addEventListener('click',openDialog);
+  document.getElementById('closeDialog').addEventListener('click',closeDialog);
+  document.getElementById('cancelDialog').addEventListener('click',closeDialog);
+  dialog.addEventListener('click',event=>{
+    if(event.target===dialog) closeDialog();
+  });
+
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    const trips = getTrips();
+    trips.push(data);
+    saveTrips(trips);
+    renderTrips();
+    closeDialog();
+  });
+
+  search.addEventListener('input',applyFilters);
+  document.querySelectorAll('.filter-tabs [data-status]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      activeStatus = button.dataset.status;
+      document.querySelectorAll('.filter-tabs [data-status]').forEach(item=>item.classList.toggle('active',item===button));
+      applyFilters();
+    });
+  });
+
+  document.getElementById('copyTripLink').addEventListener('click',async()=>{
+    const url = new URL('Europe%202026/index.html',location.href).href;
+    try{
+      await navigator.clipboard.writeText(url);
+      const button = document.getElementById('copyTripLink');
+      button.innerHTML = '<i data-lucide="check"></i>';
+      button.title = 'Link copied';
+      refreshIcons();
+      setTimeout(()=>{button.innerHTML='<i data-lucide="link"></i>';button.title='Copy itinerary link';refreshIcons()},1600);
+    }catch{
+      prompt('Copy itinerary link:',url);
+    }
+  });
+
+  window.addEventListener('DOMContentLoaded',()=>{
+    renderTrips();
+    refreshIcons();
+  });
+</script>
+</body>
+</html>
